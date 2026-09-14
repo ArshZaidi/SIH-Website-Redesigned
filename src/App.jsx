@@ -1,45 +1,1305 @@
-import { useMemo, useState } from 'react'
-import { ArrowUpRight, Menu, X, Search, SlidersHorizontal, Sparkles, GitCompareArrows, CircleCheck, Clock3, Download, Mail } from 'lucide-react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import {
+  Menu, X, Search, ArrowRight, ArrowUpRight, Check, Star, ChevronDown,
+  Users, Cpu, Lightbulb, Trophy, Calendar, Mail, Send, Sparkles,
+  BookOpen, Building2, Target, Rocket, GraduationCap, Gavel, Plus,
+  MessageSquare, Zap, Filter, Award, Layers, MapPin, ExternalLink,
+} from 'lucide-react'
 import './App.css'
+import ProblemsPage from './pages/ProblemsPage'
 
-const problems = [
-  ['PS-041','AI & ML','Forecast crop disease outbreaks from weather and satellite signals','Ministry of Agriculture','Software','Hard',84],
-  ['PS-087','Healthcare','Low-bandwidth maternal health triage for district clinics','Health Systems Lab','Software','Medium',62],
-  ['PS-112','Smart Cities','Adaptive traffic signals for mixed-mode intersections','Urban Mobility Cell','Hardware','Hard',51],
-  ['PS-136','Education','Offline-first language learning for government schools','Digital Learning Mission','Software','Easy',73],
-  ['PS-159','Cybersecurity','Phishing simulation toolkit for first-time internet users','CERT Innovation Desk','Software','Medium',45],
-  ['PS-174','Sustainability','Community-scale plastic sorting and traceability unit','Clean India Network','Hardware','Medium',38],
-  ['PS-205','Financial Inclusion','Voice-led savings assistant for rural households','Inclusion Finance Forum','Software','Easy',69],
-  ['PS-219','Disaster Management','Flood route intelligence for emergency responders','National Resilience Lab','Software','Hard',31],
-]
-const themes = ['Artificial Intelligence','Agriculture','Healthcare','Education','Sustainability','Smart Cities','Cybersecurity','Mobility','Financial Inclusion','Accessibility']
-const timeline = [
-  ['01','Problem statements','Published', '15 AUG'],['02','Institution registration','Open window','01 SEP'],['03','Team formation','Build your crew','15 SEP'],['04','Idea submission','Make it tangible','30 SEP'],['05','Screening','Expert review','12 OCT'],['06','Grand finale','Build what matters','20 NOV']
+/* =========================================================
+   DATA
+   ========================================================= */
+const PROBLEMS = [
+  {
+    id: 1, code: 'SIH25001', type: 'Software', theme: 'MedTech',
+    title: 'AI-Powered Early Disease Detection from Retinal Scans',
+    ministry: 'Ministry of Health & Family Welfare',
+    difficulty: 'Hard', ideas: 142, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in CS, ECE, Bio-medical',
+    description:
+      'Build a deep-learning pipeline that screens retinal fundus images for early markers of diabetic retinopathy and other systemic conditions, with explainable heatmaps clinicians can trust.',
+    tags: ['AI/ML', 'Healthcare', 'Computer Vision'],
+  },
+  {
+    id: 2, code: 'SIH25002', type: 'Hardware', theme: 'AgriTech',
+    title: 'Low-Cost Soil Health Sensor Network for Small Farms',
+    ministry: 'Ministry of Agriculture & Farmers Welfare',
+    difficulty: 'Medium', ideas: 98, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in ECE, Mechanical, Agri',
+    description:
+      'Design a solar-powered mesh of soil sensors reporting NPK, moisture and pH to a farmer-friendly mobile dashboard, with offline-first sync for low-connectivity regions.',
+    tags: ['IoT', 'Sensors', 'Agriculture'],
+  },
+  {
+    id: 3, code: 'SIH25003', type: 'Software', theme: 'Mobility',
+    title: 'Real-Time Multimodal Transit Planner for Tier-2 Cities',
+    ministry: 'Ministry of Housing & Urban Affairs',
+    difficulty: 'Medium', ideas: 121, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in CS, IT, Civil',
+    description:
+      'Fuse bus, metro, auto and walking data into a single journey planner with live ETA, fare estimates and accessibility-aware routing.',
+    tags: ['Maps', 'Realtime', 'Public Transport'],
+  },
+  {
+    id: 4, code: 'SIH25004', type: 'Software', theme: 'EdTech',
+    title: 'Adaptive Learning Path Generator for Regional Languages',
+    ministry: 'Ministry of Education',
+    difficulty: 'Medium', ideas: 87, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in CS, Linguistics, Design',
+    description:
+      'An adaptive engine that builds personalised learning paths from open educational resources, supporting 12+ Indian languages with voice input and offline packs.',
+    tags: ['NLP', 'Accessibility', 'Education'],
+  },
+  {
+    id: 5, code: 'SIH25005', type: 'Hardware', theme: 'CleanTech',
+    title: 'Smart Waste Segregation Bin with On-Device Vision',
+    ministry: 'Ministry of Environment, Forest & Climate Change',
+    difficulty: 'Hard', ideas: 156, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in ECE, CS, Mechanical',
+    description:
+      'An edge-AI bin that classifies waste into dry, wet and hazardous streams at source, logs fill-level and routes collection fleets efficiently.',
+    tags: ['Edge AI', 'Robotics', 'Sustainability'],
+  },
+  {
+    id: 6, code: 'SIH25006', type: 'Software', theme: 'FinTech',
+    title: 'Fraud-Aware UPI Transaction Graph Explorer',
+    ministry: 'Ministry of Finance',
+    difficulty: 'Hard', ideas: 134, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in CS, Data Science, Finance',
+    description:
+      'Build a graph-analytics console that surfaces mule-account rings and anomalous UPI flows in near real-time, with investigator-friendly case notes.',
+    tags: ['Graph', 'Security', 'Analytics'],
+  },
+  {
+    id: 7, code: 'SIH25007', type: 'Software', theme: 'Disaster Mgmt',
+    title: 'Flood Early-Warning & Evacuation Router',
+    ministry: 'Ministry of Home Affairs',
+    difficulty: 'Medium', ideas: 110, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in CS, Civil, GIS',
+    description:
+      'Combine IMD rainfall, river gauge and satellite data to issue hyperlocal flood alerts and generate safe evacuation routes for vulnerable wards.',
+    tags: ['GIS', 'Prediction', 'Public Safety'],
+  },
+  {
+    id: 8, code: 'SIH25008', type: 'Hardware', theme: 'Smart Automation',
+    title: 'Autonomous Rail Track Inspection Drone',
+    ministry: 'Ministry of Railways',
+    difficulty: 'Hard', ideas: 173, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in ECE, Aerospace, Mechanical',
+    description:
+      'A drone platform that autonomously scans track segments for cracks, obstructions and vegetation overgrowth, then files geo-tagged defect reports.',
+    tags: ['Drones', 'CV', 'Infrastructure'],
+  },
+  {
+    id: 9, code: 'SIH25009', type: 'Software', theme: 'Tourism',
+    title: 'Heritage Site AR Guide with Offline Mode',
+    ministry: 'Ministry of Tourism',
+    difficulty: 'Easy', ideas: 76, prize: '₹1,00,000',
+    eligibility: 'UG / PG students in CS, Design, Archaeology',
+    description:
+      'An AR mobile experience that overlays historical reconstructions on monuments, works fully offline, and supports Indian sign language captions.',
+    tags: ['AR', 'Offline', 'Culture'],
+  },
 ]
 
-function App(){
- const [menu,setMenu]=useState(false); const [query,setQuery]=useState(''); const [type,setType]=useState('All'); const [selected,setSelected]=useState(null); const [compare,setCompare]=useState([]); const [faq,setFaq]=useState(0); const [role,setRole]=useState('Student');
- const filtered=useMemo(()=>problems.filter(p=>(type==='All'||p[4]===type)&&p.join(' ').toLowerCase().includes(query.toLowerCase())),[query,type])
- const toggleCompare=(p)=>setCompare(c=>c.some(x=>x[0]===p[0])?c.filter(x=>x[0]!==p[0]):c.length<3?[...c,p]:c)
- return <div className="app">
-  <header className="header"><a className="brand" href="#top"><span className="brand-mark">SIH</span><span>SMART INDIA<br/><b>HACKATHON</b></span></a><nav>{[['About','#about'],['Challenges','#challenges'],['Timeline','#timeline'],['Editions','#editions'],['Resources','#resources']].map(([x,y])=><a href={y} key={x}>{x}</a>)}</nav><div className="header-actions"><a className="text-link" href="#participate">Participate <ArrowUpRight size={15}/></a><button className="menu-btn" onClick={()=>setMenu(!menu)} aria-label="Toggle menu">{menu?<X/>:<Menu/>}</button></div></header>
-  {menu&&<div className="mobile-menu">{[['About','#about'],['Challenges','#challenges'],['Find your challenge','#match'],['Timeline','#timeline'],['Editions','#editions'],['Resources','#resources'],['Participate','#participate']].map(([x,y])=><a onClick={()=>setMenu(false)} href={y} key={x}>{x}<ArrowUpRight size={18}/></a>)}</div>}
-  <main id="top">
-   <section className="hero"><div className="hero-grid"></div><div className="hero-copy"><p className="eyebrow"><span className="pulse"></span> EDITION 2025 / NOW OPEN</p><h1>Build what<br/><em>matters.</em></h1><p className="hero-desc">India's student innovation platform for turning real-world challenges into solutions with consequence.</p><div className="hero-actions"><a className="button button-primary" href="#challenges">Explore challenges <ArrowUpRight size={18}/></a><a className="button button-ghost" href="#match">Find your fit <Sparkles size={17}/></a></div></div><div className="hero-art"><div className="orbit orbit-a"></div><div className="orbit orbit-b"></div><div className="node n1">AI</div><div className="node n2">IN</div><div className="node n3">∞</div><div className="art-core">25<br/><small>YEARS OF<br/>MAKING</small></div><div className="hero-label label-a">01 / REAL PROBLEMS</div><div className="hero-label label-b">∞ / POSSIBILITY</div></div><div className="hero-foot"><span>SCROLL TO EXPLORE</span><span className="line"></span><span>28.6139° N / 77.2090° E</span></div></section>
-   <section className="intro section" id="about"><div className="section-kicker">01 — THE PLATFORM</div><div className="intro-grid"><h2>Where ambition<br/><em>meets impact.</em></h2><div><p className="lede">Smart India Hackathon is a national stage for students who refuse to accept the way things are.</p><p className="body-copy">Every edition brings ministries, industry, and young builders into the same room — not to discuss the future, but to prototype it. From a district clinic to a satellite signal, the briefs are real. The opportunity is yours.</p><a className="arrow-link" href="#timeline">See how it works <ArrowUpRight size={17}/></a></div></div><div className="stat-strip">{[['24K+','students'],['1.8K','institutes'],['600+','challenges'],['14','editions']].map(([n,l])=><div className="stat" key={l}><strong>{n}</strong><span>{l}</span></div>)}</div></section>
-   <section className="challenge-intro section" id="challenges"><div className="section-kicker">02 — THE BRIEFS</div><div className="formula"><span>REAL<br/><em>PROBLEMS</em></span><b>+</b><span>STUDENT<br/><em>TEAMS</em></span><b>+</b><span>TECH<br/><em>THAT MOVES</em></span><b>=</b><span className="impact">IMPACT<span className="dot">.</span></span></div><div className="featured-row">{problems.slice(0,3).map(p=><article className="featured-card" key={p[0]} onClick={()=>setSelected(p)}><div className="card-top"><span className="mono">{p[0]}</span><span className="badge">{p[4]}</span></div><h3>{p[2]}</h3><div className="card-bottom"><span>{p[1]}</span><ArrowUpRight size={19}/></div></article>)}</div><a className="button button-dark" href="#explorer">Browse all challenges <ArrowUpRight size={17}/></a></section>
-   <section className="explorer section" id="explorer"><div className="section-heading"><div><div className="section-kicker">03 — FIND YOUR BRIEF</div><h2>Choose a problem<br/><em>worth solving.</em></h2></div><p>Every challenge is a door. Find the one that opens onto your team's strongest work.</p></div><div className="filter-bar"><div className="search-box"><Search size={18}/><input id="search" aria-label="Search problem statements" placeholder="Search by challenge, theme or ministry" value={query} onChange={e=>setQuery(e.target.value)}/></div><div className="filter-pills">{['All','Software','Hardware'].map(x=><button className={type===x?'active':''} key={x} onClick={()=>setType(x)}>{x}</button>)}</div><button className="filter-icon" aria-label="More filters"><SlidersHorizontal size={18}/></button></div><div className="result-line"><span>{filtered.length} of {problems.length} challenges</span><span className="mono">SORTED BY RELEVANCE</span></div><div className="problem-list">{filtered.map(p=><article className="problem-row" key={p[0]}><div className="problem-number mono">{p[0]}</div><div className="problem-main"><span className="meta">{p[1]} · {p[3]}</span><h3>{p[2]}</h3><div className="tags"><span>{p[4]}</span><span>{p[5]}</span><span>{p[6]} ideas</span></div></div><button className="compare-btn" onClick={()=>toggleCompare(p)} aria-label={`Compare ${p[0]}`}>{compare.some(x=>x[0]===p[0])?<CircleCheck size={19}/>:<GitCompareArrows size={19}/>}</button><button className="row-arrow" onClick={()=>setSelected(p)} aria-label={`Open ${p[0]}`}><ArrowUpRight size={20}/></button></article>)}</div></section>
-   <section className="match section" id="match"><div className="match-panel"><div><div className="section-kicker">04 — ORIGINAL FEATURE</div><h2>Find your<br/><em>challenge.</em></h2><p>Tell us what your team cares about. We’ll point you toward a brief with a pulse.</p></div><div className="match-options"><p className="label">I want to build for</p><div className="option-grid">{themes.slice(0,6).map(t=><button key={t} onClick={()=>{}}>{t}</button>)}</div><a className="button button-primary" href="#explorer">Show my matches <Sparkles size={17}/></a></div></div></section>
-   <section className="journey section"><div className="section-heading"><div><div className="section-kicker">05 — THE JOURNEY</div><h2>From brief<br/><em>to breakthrough.</em></h2></div><div className="journey-id"><span>DEMO TEAM ID</span><b>IN—25—0417</b></div></div><div className="journey-track">{['Submitted','Shortlisted','Nominated','Finalist'].map((x,i)=><div className={`journey-step ${i<2?'done':''}`} key={x}><div className="step-dot">{i<2?'✓':String(i+1).padStart(2,'0')}</div><h3>{x}</h3><span>{i<2?'12 SEP 2025':i===2?'UP NEXT':'20 NOV 2025'}</span></div>)}</div><div className="progress-note"><Clock3 size={17}/><span>Demo state · Your team is currently shortlisted</span></div></section>
-   <section className="timeline section" id="timeline"><div className="section-kicker">06 — MARK THE MOMENT</div><div className="timeline-head"><h2>The road to<br/><em>the finale.</em></h2><span className="mono">2025 / 06 MILESTONES</span></div><div className="timeline-scroll">{timeline.map(([n,t,d,date])=><div className="time-card" key={n}><span className="time-number mono">{n}</span><div className="time-index"></div><span className="time-date">{date}</span><h3>{t}</h3><p>{d}</p></div>)}</div></section>
-   <section className="themes section"><div className="section-kicker">07 — THE TERRITORY</div><h2>Many frontiers.<br/><em>One instinct.</em></h2><div className="theme-list">{themes.map((t,i)=><a href="#explorer" className="theme-item" key={t}><span className="mono">0{i+1}</span><b>{t}</b><ArrowUpRight size={19}/></a>)}</div></section>
-   <section className="editions section" id="editions"><div className="section-kicker">08 — THE ARCHIVE</div><div className="edition-feature"><div><span className="mono">EDITION / 2023</span><h2>Ideas that<br/><em>left a mark.</em></h2><p>From climate intelligence to assistive technology, the archive is a record of students who chose to build beyond the obvious.</p><a className="arrow-link" href="#resources">Explore the archive <ArrowUpRight size={17}/></a></div><div className="edition-number">14</div></div></section>
-   <section className="participate section" id="participate"><div className="section-kicker">09 — YOUR ENTRY POINT</div><div className="participate-head"><h2>Where do you<br/><em>begin?</em></h2><p>This is a concept experience. Select a role to see how your first step could look.</p></div><div className="role-tabs">{['Student','SPOC','Problem creator'].map(x=><button className={role===x?'active':''} onClick={()=>setRole(x)} key={x}>{x}</button>)}</div><div className="role-panel"><div><span className="mono">YOU ARE A {role.toUpperCase()}</span><h3>{role==='Student'?'Bring your curiosity.':role==='SPOC'?'Move your institution forward.':'Put a real brief on the table.'}</h3><p>{role==='Student'?'Explore challenges, gather your team, and build something that earns its place in the world.':'A mocked entry point for this student redesign concept.'}</p></div><a className="button button-primary" href="#footer">Continue as {role} <ArrowUpRight size={17}/></a></div></section>
-   <section className="resources section" id="resources"><div className="section-kicker">10 — KEEP GOING</div><div className="resource-grid"><div><h2>Make room<br/><em>for better.</em></h2><p className="body-copy">Guides, timelines, and the small details that help big ideas arrive ready.</p></div><div className="resource-links">{['Student handbook','Evaluation criteria','Team formation guide','Hardware edition guide'].map((x,i)=><a href="#footer" key={x}><span><span className="mono">0{i+1}</span>{x}</span><Download size={17}/></a>)}</div></div></section>
-  </main>
-  {selected&&<div className="modal-backdrop" onClick={()=>setSelected(null)}><article className="detail-modal" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setSelected(null)} aria-label="Close"><X/></button><span className="mono">{selected[0]} · {selected[4]} · {selected[5]}</span><h2>{selected[2]}</h2><p className="meta">{selected[3]} · {selected[1]}</p><p className="modal-copy">Design a resilient, human-centred solution for this challenge. This illustrative brief invites teams to combine field research, thoughtful systems, and responsible technology.</p><div className="modal-stats"><span><b>{selected[6]}</b> ideas submitted</span><span><b>{selected[4]}</b> edition</span></div><button className="button button-primary" onClick={()=>toggleCompare(selected)}> {compare.some(x=>x[0]===selected[0])?'Remove from compare':'Add to compare'} <GitCompareArrows size={17}/></button></article></div>}
-  {compare.length>0&&<div className="compare-dock"><span><b>{compare.length}</b> selected for comparison</span><button onClick={()=>setCompare([])}>Clear</button><a href="#explorer">Review <ArrowUpRight size={16}/></a></div>}
-  <footer id="footer"><div className="footer-top"><div className="brand footer-brand"><span className="brand-mark">SIH</span><span>SMART INDIA<br/><b>HACKATHON</b></span></div><h2>Build what<br/><em>matters.</em></h2></div><div className="footer-links"><div><span>EXPLORE</span><a href="#about">About SIH</a><a href="#challenges">Challenges</a><a href="#timeline">Timeline</a></div><div><span>PARTICIPATE</span><a href="#match">Find your challenge</a><a href="#participate">Role entry</a><a href="#editions">Editions</a></div><div><span>CONNECT</span><a href="mailto:concept@sih.example"><Mail size={15}/> Email</a><a href="#footer">in&nbsp; LinkedIn</a><a href="#footer">◎&nbsp; Instagram</a></div></div><div className="footer-bottom"><p>Smart India Hackathon is an initiative of the Ministry of Education's Innovation Cell (MIC) & AICTE.</p><p>This website is a student redesign concept created for educational/hackathon purposes. It is not an official Smart India Hackathon platform.</p><span>© 2025 SIH CONCEPT / MADE TO MOVE</span></div></footer>
- </div>
+const THEMES = [
+  'MedTech', 'AgriTech', 'Smart Automation', 'CleanTech', 'Mobility',
+  'EdTech', 'FinTech', 'Disaster Mgmt', 'Tourism', 'Space', 'Robotics', 'Blockchain',
+]
+
+const TIMELINE = [
+  { date: 'Aug 01', title: 'Registrations Open', desc: 'Teams of 6 register on the portal with a nominated mentor.' },
+  { date: 'Aug 20', title: 'Idea Submission', desc: 'Submit your idea deck against a chosen problem statement.' },
+  { date: 'Sep 05', title: 'Campus Evaluation', desc: 'Institutional SPOC shortlists the top teams per college.' },
+  { date: 'Sep 25', title: 'Grand Finale — Round 1', desc: '36-hour hackathon begins across nodal centres.' },
+  { date: 'Sep 27', title: 'Grand Finale — Round 2', desc: 'Top teams pitch to the national jury.' },
+  { date: 'Oct 10', title: 'Winners Announced', desc: '₹1,00,000 per winning team + incubation support.' },
+]
+
+const JOURNEY = [
+  { step: '01', title: 'Register', desc: 'Create your team and pick a problem statement.', icon: Users },
+  { step: '02', title: 'Build', desc: 'Prototype with mentor support and open datasets.', icon: Cpu },
+  { step: '03', title: 'Submit', desc: 'Upload your repo, demo video and pitch deck.', icon: BookOpen },
+  { step: '04', title: 'Pitch', desc: 'Present live to the national jury at the finale.', icon: Trophy },
+]
+
+const SEED_REVIEWS = [
+  {
+    id: 'r1', name: 'Ananya Sharma', role: 'Student', rating: 5,
+    title: 'The explorer made shortlisting painless',
+    message: 'Filtering by theme and difficulty in one go saved our team an entire evening. We found our AgriTech problem in minutes.',
+    date: '2 days ago',
+  },
+  {
+    id: 'r2', name: 'Dr. R. Menon', role: 'Mentor', rating: 4,
+    title: 'Clean, fast, and focused',
+    message: 'The problem detail cards surface exactly what mentors need — eligibility, ministry and difficulty. Would love CSV export.',
+    date: '1 week ago',
+  },
+  {
+    id: 'r3', name: 'Karthik Iyer', role: 'Student', rating: 5,
+    title: 'Compare dock is a killer feature',
+    message: 'Being able to line up three problem statements side-by-side before committing was genuinely useful.',
+    date: '2 weeks ago',
+  },
+]
+
+/* =========================================================
+   HOOKS & HELPERS
+   ========================================================= */
+function useReveal() {
+  const ref = useRef(null)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setShown(true)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return [ref, shown]
 }
-export default App
+
+function Reveal({ children, delay = 0, className = '', as: Tag = 'div' }) {
+  const [ref, shown] = useReveal()
+  return (
+    <Tag
+      ref={ref}
+      className={`reveal ${shown ? 'in' : ''} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </Tag>
+  )
+}
+
+function Counter({ to, duration = 1600, suffix = '' }) {
+  const ref = useRef(null)
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    let raf
+    let started = false
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && !started) {
+          started = true
+          let t0
+          const step = (t) => {
+            if (!t0) t0 = t
+            const p = Math.min((t - t0) / duration, 1)
+            const eased = 1 - Math.pow(1 - p, 3)
+            setVal(Math.floor(eased * to))
+            if (p < 1) raf = requestAnimationFrame(step)
+            else setVal(to)
+          }
+          raf = requestAnimationFrame(step)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.4 },
+    )
+    io.observe(el)
+    return () => {
+      io.disconnect()
+      cancelAnimationFrame(raf)
+    }
+  }, [to, duration])
+  return <span ref={ref}>{val.toLocaleString('en-IN')}{suffix}</span>
+}
+
+const DIFF_ORDER = { Easy: 1, Medium: 2, Hard: 3 }
+
+/* =========================================================
+   SMALL COMPONENTS
+   ========================================================= */
+function StarRating({ value, onChange, size = 22, readOnly = false }) {
+  const [hover, setHover] = useState(0)
+  return (
+    <div className={`stars ${readOnly ? 'readonly' : ''}`} role={readOnly ? undefined : 'radiogroup'}>
+      {[1, 2, 3, 4, 5].map((n) => {
+        const active = (hover || value) >= n
+        return (
+          <button
+            key={n}
+            type="button"
+            className={`star-btn ${active ? 'on' : ''}`}
+            disabled={readOnly}
+            aria-label={`${n} star${n > 1 ? 's' : ''}`}
+            onMouseEnter={() => !readOnly && setHover(n)}
+            onMouseLeave={() => !readOnly && setHover(0)}
+            onClick={() => !readOnly && onChange?.(n)}
+          >
+            <Star size={size} strokeWidth={1.6} fill={active ? 'currentColor' : 'none'} />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function Toast({ toast, onClose }) {
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(onClose, 3600)
+    return () => clearTimeout(t)
+  }, [toast, onClose])
+  if (!toast) return null
+  return (
+    <div className="toast" role="status" aria-live="polite" key={toast.id}>
+      <div className="toast-icon"><Check size={16} strokeWidth={2.4} /></div>
+      <div className="toast-body">
+        <strong>{toast.title}</strong>
+        {toast.msg && <span>{toast.msg}</span>}
+      </div>
+      <button className="toast-x" onClick={onClose} aria-label="Dismiss"><X size={14} /></button>
+    </div>
+  )
+}
+
+/* =========================================================
+   APP
+   ========================================================= */
+export default function App() {
+  /* ---- page routing ---- */
+  const [page, setPage] = useState('home') // 'home' | 'problems'
+
+  /* ---- nav ---- */
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  /* ---- explorer filters ---- */
+  const [query, setQuery] = useState('')
+  const [type, setType] = useState('All')
+  const [theme, setTheme] = useState('All')
+  const [difficulty, setDifficulty] = useState('All')
+  const [sort, setSort] = useState('popular')
+
+  /* ---- modals / overlays ---- */
+  const [selected, setSelected] = useState(null)       // problem detail
+  const [compare, setCompare] = useState([])           // ids
+  const [showCompare, setShowCompare] = useState(false)
+  const [showReview, setShowReview] = useState(false)
+  const [faqOpen, setFaqOpen] = useState(null)
+
+  /* ---- tabs ---- */
+  const [role, setRole] = useState('Student')
+
+  /* ---- reviews ---- */
+  const [reviews, setReviews] = useState(SEED_REVIEWS)
+
+  /* ---- toast ---- */
+  const [toast, setToast] = useState(null)
+  const notify = useCallback((title, msg) => {
+    setToast({ id: Date.now(), title, msg })
+  }, [])
+
+  /* ---- lock body scroll when any overlay open ---- */
+  const anyOverlay = !!selected || showCompare || showReview
+  useEffect(() => {
+    document.body.classList.toggle('no-scroll', anyOverlay)
+    return () => document.body.classList.remove('no-scroll')
+  }, [anyOverlay])
+
+  /* ---- esc closes overlays ---- */
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return
+      setSelected(null)
+      setShowCompare(false)
+      setShowReview(false)
+      setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  /* ---- scroll to top when switching pages ---- */
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [page])
+
+  /* ---- smooth scroll helper ---- */
+  const scrollTo = useCallback((id) => {
+    setMenuOpen(false)
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
+
+  /* ---- open the full problems page ---- */
+  const openProblems = useCallback(() => {
+    setMenuOpen(false)
+    setPage('problems')
+  }, [])
+
+  /* ---- filtering + sorting (all combinable) ---- */
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    let list = PROBLEMS.filter((p) => {
+      if (type !== 'All' && p.type !== type) return false
+      if (theme !== 'All' && p.theme !== theme) return false
+      if (difficulty !== 'All' && p.difficulty !== difficulty) return false
+      if (!q) return true
+      const haystack = [
+        p.title, p.ministry, p.category, p.theme, p.code,
+        p.type, p.difficulty, p.description,
+        ...(p.tags || []),
+      ].join(' ').toLowerCase()
+      return haystack.includes(q)
+    })
+
+    list = [...list].sort((a, b) => {
+      if (sort === 'title') return a.title.localeCompare(b.title)
+      if (sort === 'difficulty') return DIFF_ORDER[a.difficulty] - DIFF_ORDER[b.difficulty]
+      if (sort === 'ideas') return b.ideas - a.ideas
+      return b.ideas - a.ideas // popular
+    })
+    return list
+  }, [query, type, theme, difficulty, sort])
+
+  const activeFilterCount =
+    (type !== 'All') + (theme !== 'All') + (difficulty !== 'All') + (query.trim() ? 1 : 0)
+
+  const resetFilters = () => {
+    setQuery('')
+    setType('All')
+    setTheme('All')
+    setDifficulty('All')
+    setSort('popular')
+  }
+
+  /* ---- compare helpers ---- */
+  const toggleCompare = (id) => {
+    setCompare((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id)
+      if (prev.length >= 3) {
+        notify('Compare limit reached', 'You can compare up to 3 problems at once.')
+        return prev
+      }
+      return [...prev, id]
+    })
+  }
+  const compareItems = useMemo(
+    () => compare.map((id) => PROBLEMS.find((p) => p.id === id)).filter(Boolean),
+    [compare],
+  )
+
+  /* ---- FAQ ---- */
+  const FAQS = [
+    {
+      q: 'Who can participate in Smart India Hackathon?',
+      a: 'Any full-time student enrolled in a recognised Indian institution (UG, PG, or PhD) can participate. Teams must have 6 members with at least one female member and a nominated mentor.',
+    },
+    {
+      q: 'Is there a registration fee?',
+      a: 'No. Participation in SIH is completely free for students. Travel and stay for the grand finale are supported by the organising ministry.',
+    },
+    {
+      q: 'Can a team submit ideas for more than one problem statement?',
+      a: 'Yes — a team may submit ideas for multiple problem statements during the idea phase, but can only compete with one at the grand finale.',
+    },
+    {
+      q: 'What is the prize for the winning team?',
+      a: 'Each winning team receives ₹1,00,000 in prize money along with incubation and mentorship support from partner organisations.',
+    },
+  ]
+
+  /* =========================================================
+     RENDER: PROBLEMS PAGE (full-page route)
+     ========================================================= */
+  if (page === 'problems') {
+    return <ProblemsPage onBack={() => setPage('home')} />
+  }
+
+  /* =========================================================
+     RENDER: HOME PAGE
+     ========================================================= */
+  return (
+    <div className="app">
+      {/* ============ HEADER ============ */}
+      <header className={`header ${menuOpen ? 'open' : ''}`}>
+        <div className="header-inner">
+          <button className="brand" onClick={() => scrollTo('top')} aria-label="Go to top">
+            <span className="brand-mark">
+              <span className="bm-saffron" />
+              <span className="bm-green" />
+            </span>
+            <span className="brand-text">
+              <strong>Smart India</strong>
+              <em>Hackathon</em>
+            </span>
+          </button>
+
+          <nav className={`nav ${menuOpen ? 'show' : ''}`}>
+            {/* Nav item: Problems → opens full page */}
+            <button className="nav-link" onClick={openProblems}>
+              Problems
+            </button>
+
+            {[
+              ['Journey', 'journey'],
+              ['Timeline', 'timeline'],
+              ['Themes', 'themes'],
+              ['Reviews', 'reviews'],
+              ['Resources', 'resources'],
+            ].map(([label, id]) => (
+              <button key={id} onClick={() => scrollTo(id)} className="nav-link">
+                {label}
+              </button>
+            ))}
+            <button className="nav-cta" onClick={() => scrollTo('reviews')}>
+              Write a review <ArrowRight size={15} />
+            </button>
+          </nav>
+
+          <button
+            className="menu-btn"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+        <div className="header-glow" />
+      </header>
+
+      {/* ============ HERO ============ */}
+      <section className="hero" id="top">
+        <div className="hero-bg" aria-hidden="true">
+          <div className="hero-grid" />
+          <div className="hero-orbit">
+            <span className="orbit-ring r1" />
+            <span className="orbit-ring r2" />
+            <span className="orbit-ring r3" />
+            <span className="orbit-dot d1" />
+            <span className="orbit-dot d2" />
+            <span className="orbit-dot d3" />
+          </div>
+        </div>
+
+        <div className="hero-inner">
+          <Reveal>
+            <span className="eyebrow mono">
+              <Sparkles size={13} /> 10th Edition · 2026
+            </span>
+          </Reveal>
+          <Reveal delay={80}>
+            <h1 className="hero-title">
+              Where India&rsquo;s sharpest
+              <span className="grad"> student minds </span>
+              build for the nation.
+            </h1>
+          </Reveal>
+          <Reveal delay={160}>
+            <p className="hero-sub">
+              Smart India Hackathon is the world&rsquo;s largest open innovation
+              movement. Pick a real problem from a ministry, build a working
+              prototype in 36 hours, and pitch it to a national jury.
+            </p>
+          </Reveal>
+          <Reveal delay={240}>
+            <div className="hero-actions">
+              {/* Hero CTA: Explore problem statements → opens full page */}
+              <button className="btn btn-primary" onClick={openProblems}>
+                Explore problem statements <ArrowRight size={17} />
+              </button>
+              <button className="btn btn-ghost" onClick={() => scrollTo('journey')}>
+                How it works
+              </button>
+            </div>
+          </Reveal>
+
+          <Reveal delay={320}>
+            <div className="hero-strip">
+              {[
+                ['Problems', 250, '+'],
+                ['Institutions', 5000, '+'],
+                ['Prize / team', 1, 'L'],
+                ['States', 36, ''],
+              ].map(([label, n, suf]) => (
+                <div key={label} className="hero-stat">
+                  <strong className="mono"><Counter to={n} suffix={suf} /></strong>
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============ FEATURED ============ */}
+      <section className="section">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Featured</span>
+              <h2>This week&rsquo;s highlighted challenges</h2>
+              <p>Hand-picked problem statements across ministries that need fresh thinking.</p>
+            </div>
+          </Reveal>
+
+          <div className="featured-grid">
+            {PROBLEMS.slice(0, 3).map((p, i) => (
+              <Reveal key={p.id} delay={i * 90}>
+                <article className="featured-card" onClick={() => setSelected(p)}>
+                  <div className="fc-top">
+                    <span className={`pill pill-${p.type.toLowerCase()}`}>{p.type}</span>
+                    <span className="mono fc-code">{p.code}</span>
+                  </div>
+                  <h3>{p.title}</h3>
+                  <p className="fc-desc">{p.description.slice(0, 118)}…</p>
+                  <div className="fc-meta">
+                    <span><Building2 size={13} /> {p.ministry.replace('Ministry of ', '')}</span>
+                    <span><Lightbulb size={13} /> {p.ideas} ideas</span>
+                  </div>
+                  <div className="fc-cta">
+                    View details <ArrowUpRight size={15} />
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ EXPLORER (preview on home) ============ */}
+      <section className="section section-alt" id="explorer">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Explorer</span>
+              <h2>Find the problem you were built for</h2>
+              <p>Search, filter and compare every problem statement in one place.</p>
+            </div>
+          </Reveal>
+
+          {/* filter bar */}
+          <Reveal delay={80}>
+            <div className="filter-bar">
+              <div className="search-wrap">
+                <Search size={17} className="search-icon" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by title, ministry, tag, code…"
+                  aria-label="Search problem statements"
+                />
+                {query && (
+                  <button className="clear-btn" onClick={() => setQuery('')} aria-label="Clear search">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              <div className="filter-row">
+                <div className="chip-group" role="group" aria-label="Type filter">
+                  {['All', 'Software', 'Hardware'].map((t) => (
+                    <button
+                      key={t}
+                      className={`chip ${type === t ? 'on' : ''}`}
+                      onClick={() => setType(t)}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="chip-group" role="group" aria-label="Difficulty filter">
+                  {['All', 'Easy', 'Medium', 'Hard'].map((d) => (
+                    <button
+                      key={d}
+                      className={`chip ${difficulty === d ? 'on' : ''}`}
+                      onClick={() => setDifficulty(d)}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+
+                <select
+                  className="select"
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                  aria-label="Theme filter"
+                >
+                  <option value="All">All themes</option>
+                  {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+
+                <select
+                  className="select"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  aria-label="Sort by"
+                >
+                  <option value="popular">Most ideas</option>
+                  <option value="ideas">Fewest ideas</option>
+                  <option value="title">A → Z</option>
+                  <option value="difficulty">Easiest first</option>
+                </select>
+
+                {activeFilterCount > 0 && (
+                  <button className="btn-reset" onClick={resetFilters}>
+                    <X size={14} /> Clear ({activeFilterCount})
+                  </button>
+                )}
+              </div>
+
+              <div className="results-line">
+                <Filter size={14} />
+                <span>
+                  Showing <strong>{filtered.length}</strong> of {PROBLEMS.length} problem statements
+                  {' · '}
+                  <button className="link-inline" onClick={openProblems}>
+                    View all →
+                  </button>
+                </span>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* results */}
+          {filtered.length === 0 ? (
+            <Reveal>
+              <div className="empty">
+                <Search size={32} />
+                <h3>No matches found</h3>
+                <p>Try a different keyword or clear the filters to see everything.</p>
+                <button className="btn btn-primary" onClick={resetFilters}>Reset filters</button>
+              </div>
+            </Reveal>
+          ) : (
+            <div className="problems-grid">
+              {filtered.slice(0, 6).map((p, i) => {
+                const inCompare = compare.includes(p.id)
+                return (
+                  <Reveal key={p.id} delay={Math.min(i * 50, 300)}>
+                    <article className="problem-card">
+                      <div className="pc-top">
+                        <span className={`pill pill-${p.type.toLowerCase()}`}>{p.type}</span>
+                        <span className={`pill diff diff-${p.difficulty.toLowerCase()}`}>
+                          {p.difficulty}
+                        </span>
+                      </div>
+                      <span className="mono pc-code">{p.code} · {p.theme}</span>
+                      <h3>{p.title}</h3>
+                      <p className="pc-desc">{p.description}</p>
+                      <div className="pc-tags">
+                        {p.tags.map((t) => <span key={t} className="tag">{t}</span>)}
+                      </div>
+                      <div className="pc-meta">
+                        <span><Building2 size={13} /> {p.ministry.replace('Ministry of ', '')}</span>
+                        <span><Lightbulb size={13} /> {p.ideas}</span>
+                        <span><Award size={13} /> {p.prize}</span>
+                      </div>
+                      <div className="pc-actions">
+                        <button className="btn btn-sm btn-primary" onClick={() => setSelected(p)}>
+                          View details
+                        </button>
+                        <button
+                          className={`btn btn-sm btn-ghost ${inCompare ? 'active' : ''}`}
+                          onClick={() => toggleCompare(p.id)}
+                        >
+                          {inCompare ? <Check size={14} /> : <Plus size={14} />}
+                          {inCompare ? 'Added' : 'Compare'}
+                        </button>
+                      </div>
+                    </article>
+                  </Reveal>
+                )
+              })}
+            </div>
+          )}
+
+          {/* CTA below preview grid */}
+          {filtered.length > 6 && (
+            <Reveal>
+              <div className="preview-cta">
+                <button className="btn btn-primary" onClick={openProblems}>
+                  View all {filtered.length} problem statements <ArrowRight size={16} />
+                </button>
+              </div>
+            </Reveal>
+          )}
+        </div>
+      </section>
+
+      {/* ============ JOURNEY ============ */}
+      <section className="section" id="journey">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Journey</span>
+              <h2>From idea to national finale</h2>
+              <p>Four steps. Thirty-six hours. One prototype that could change a ministry.</p>
+            </div>
+          </Reveal>
+          <div className="journey-grid">
+            {JOURNEY.map((j, i) => {
+              const Icon = j.icon
+              return (
+                <Reveal key={j.step} delay={i * 90}>
+                  <div className="journey-card">
+                    <div className="jc-icon"><Icon size={22} /></div>
+                    <span className="mono jc-step">{j.step}</span>
+                    <h3>{j.title}</h3>
+                    <p>{j.desc}</p>
+                    <div className="jc-line" />
+                  </div>
+                </Reveal>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ TIMELINE ============ */}
+      <section className="section section-alt" id="timeline">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Timeline</span>
+              <h2>Key dates you cannot miss</h2>
+            </div>
+          </Reveal>
+          <div className="timeline">
+            {TIMELINE.map((t, i) => (
+              <Reveal key={t.date} delay={i * 70}>
+                <div className="tl-item">
+                  <div className="tl-dot" />
+                  <span className="mono tl-date"><Calendar size={13} /> {t.date}</span>
+                  <h4>{t.title}</h4>
+                  <p>{t.desc}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ THEMES ============ */}
+      <section className="section" id="themes">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Themes</span>
+              <h2>Twelve tracks. Infinite problems.</h2>
+              <p>Every problem statement maps to one of these thematic areas.</p>
+            </div>
+          </Reveal>
+          <div className="themes-grid">
+            {THEMES.map((t, i) => (
+              <Reveal key={t} delay={i * 35}>
+                <button
+                  className={`theme-card ${theme === t ? 'on' : ''}`}
+                  onClick={() => {
+                    setTheme(theme === t ? 'All' : t)
+                    scrollTo('explorer')
+                  }}
+                >
+                  <Layers size={16} />
+                  <span>{t}</span>
+                </button>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ PARTICIPATE ============ */}
+      <section className="section section-alt" id="participate">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Participate</span>
+              <h2>Three ways to be part of SIH</h2>
+            </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <div className="role-tabs">
+              {[
+                ['Student', GraduationCap],
+                ['Mentor', Users],
+                ['Judge', Gavel],
+              ].map(([r, Icon]) => (
+                <button
+                  key={r}
+                  className={`role-tab ${role === r ? 'on' : ''}`}
+                  onClick={() => setRole(r)}
+                >
+                  <Icon size={16} /> {r}
+                </button>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal delay={140}>
+            <div className="role-panel" key={role}>
+              {role === 'Student' && (
+                <>
+                  <h3>Build something that ships</h3>
+                  <p>
+                    Form a team of six, choose a problem statement, and prototype
+                    alongside mentors from the sponsoring ministry. Winners receive
+                    ₹1,00,000 and incubation support.
+                  </p>
+                  <ul className="role-list">
+                    <li><Check size={15} /> Open to all UG, PG and PhD students</li>
+                    <li><Check size={15} /> No registration fee</li>
+                    <li><Check size={15} /> Travel & stay covered for the finale</li>
+                  </ul>
+                </>
+              )}
+              {role === 'Mentor' && (
+                <>
+                  <h3>Guide the next generation</h3>
+                  <p>
+                    Mentors review submissions, run office hours during the finale,
+                    and help teams translate prototypes into deployable pilots.
+                  </p>
+                  <ul className="role-list">
+                    <li><Check size={15} /> Industry or academic professionals</li>
+                    <li><Check size={15} /> Commit ~6 hours across the finale weekend</li>
+                    <li><Check size={15} /> Recognised on the national portal</li>
+                  </ul>
+                </>
+              )}
+              {role === 'Judge' && (
+                <>
+                  <h3>Decide what moves forward</h3>
+                  <p>
+                    Judges score prototypes on innovation, feasibility, impact and
+                    scalability, then defend their rankings to the national panel.
+                  </p>
+                  <ul className="role-list">
+                    <li><Check size={15} /> Domain experts and ministry officials</li>
+                    <li><Check size={15} /> Structured rubric-based evaluation</li>
+                    <li><Check size={15} /> Confidentiality agreement required</li>
+                  </ul>
+                </>
+              )}
+              <button className="btn btn-primary" onClick={() => scrollTo('reviews')}>
+                Share your experience <ArrowRight size={16} />
+              </button>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============ REVIEWS ============ */}
+      <section className="section" id="reviews">
+        <div className="container">
+          <Reveal>
+            <div className="section-head reviews-head">
+              <div>
+                <span className="kicker mono">// Reviews</span>
+                <h2>What participants are saying</h2>
+                <p>{reviews.length} review{reviews.length !== 1 ? 's' : ''} from students, mentors and judges.</p>
+              </div>
+              <button className="btn btn-primary" onClick={() => setShowReview(true)}>
+                <MessageSquare size={16} /> Write a review
+              </button>
+            </div>
+          </Reveal>
+
+          <div className="reviews-grid">
+            {reviews.map((r, i) => (
+              <Reveal key={r.id} delay={Math.min(i * 60, 240)}>
+                <article className="review-card">
+                  <div className="rv-top">
+                    <div className="rv-avatar" aria-hidden="true">
+                      {r.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                    </div>
+                    <div className="rv-person">
+                      <strong>{r.name}</strong>
+                      <span>{r.role} · {r.date}</span>
+                    </div>
+                  </div>
+                  <StarRating value={r.rating} readOnly size={16} />
+                  <h4>{r.title}</h4>
+                  <p>{r.message}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ RESOURCES / FAQ ============ */}
+      <section className="section section-alt" id="resources">
+        <div className="container">
+          <Reveal>
+            <div className="section-head">
+              <span className="kicker mono">// Resources</span>
+              <h2>Everything you need before you start</h2>
+            </div>
+          </Reveal>
+
+          <div className="resources-layout">
+            <Reveal delay={60}>
+              <div className="resource-cards">
+                {[
+                  { icon: BookOpen, title: 'Idea Submission Template', desc: 'The exact deck structure the jury expects.' },
+                  { icon: Target, title: 'Evaluation Rubric', desc: 'How innovation, impact and feasibility are scored.' },
+                  { icon: Rocket, title: 'Prototype Starter Kits', desc: 'Boilerplates, datasets and APIs by theme.' },
+                  { icon: Zap, title: 'Mentor Office Hours', desc: 'Book slots with ministry-appointed mentors.' },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <div key={title} className="resource-card">
+                    <div className="rc-icon"><Icon size={18} /></div>
+                    <div>
+                      <h4>{title}</h4>
+                      <p>{desc}</p>
+                    </div>
+                    <ArrowUpRight size={16} className="rc-arrow" />
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal delay={120}>
+              <div className="faq">
+                <h3 className="faq-head">Frequently asked</h3>
+                {FAQS.map((f, i) => (
+                  <div key={f.q} className={`faq-item ${faqOpen === i ? 'open' : ''}`}>
+                    <button
+                      className="faq-q"
+                      onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                      aria-expanded={faqOpen === i}
+                    >
+                      <span>{f.q}</span>
+                      <ChevronDown size={18} className="faq-chev" />
+                    </button>
+                    <div className="faq-a">
+                      <p>{f.a}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ FOOTER ============ */}
+      <footer className="footer">
+        <div className="container footer-inner">
+          <div className="footer-brand">
+            <span className="brand-mark">
+              <span className="bm-saffron" />
+              <span className="bm-green" />
+            </span>
+            <div>
+              <strong>Smart India Hackathon</strong>
+              <p className="mono">A student redesign concept · Not an official platform</p>
+            </div>
+          </div>
+
+          <div className="footer-cols">
+            <div>
+              <h5>Explore</h5>
+              <button onClick={openProblems}>Problem statements</button>
+              <button onClick={() => scrollTo('journey')}>How it works</button>
+              <button onClick={() => scrollTo('timeline')}>Timeline</button>
+              <button onClick={() => scrollTo('themes')}>Themes</button>
+            </div>
+            <div>
+              <h5>Engage</h5>
+              <button onClick={() => setShowReview(true)}>Write a review</button>
+              <button onClick={() => scrollTo('reviews')}>Read reviews</button>
+              <button onClick={() => scrollTo('resources')}>Resources</button>
+              <button onClick={() => scrollTo('participate')}>Participate</button>
+            </div>
+            <div>
+              <h5>Contact</h5>
+              <a href="mailto:hello@sih.example"><Mail size={14} /> hello@sih.example</a>
+              <a href="mailto:press@sih.example"><Send size={14} /> press@sih.example</a>
+              <span className="mono footer-loc"><MapPin size={14} /> New Delhi, India</span>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <span className="mono">© 2026 Smart India Hackathon · Redesign concept</span>
+          <span className="mono">Built with React + Vite</span>
+        </div>
+      </footer>
+
+      {/* ============ COMPARE DOCK ============ */}
+      {compare.length > 0 && (
+        <div className="compare-dock">
+          <div className="dock-inner">
+            <span className="dock-label mono"><Layers size={14} /> Compare ({compare.length}/3)</span>
+            <div className="dock-items">
+              {compareItems.map((p) => (
+                <div key={p.id} className="dock-chip">
+                  <span>{p.code}</span>
+                  <button onClick={() => toggleCompare(p.id)} aria-label={`Remove ${p.code}`}>
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="dock-actions">
+              <button className="btn btn-sm btn-ghost" onClick={() => setCompare([])}>Clear</button>
+              <button
+                className="btn btn-sm btn-primary"
+                disabled={compare.length < 2}
+                onClick={() => setShowCompare(true)}
+              >
+                Compare now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ PROBLEM DETAIL MODAL ============ */}
+      {selected && (
+        <div className="modal-backdrop" onClick={() => setSelected(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <button className="modal-x" onClick={() => setSelected(null)} aria-label="Close">
+              <X size={20} />
+            </button>
+            <div className="modal-body">
+              <div className="modal-top">
+                <span className={`pill pill-${selected.type.toLowerCase()}`}>{selected.type}</span>
+                <span className={`pill diff diff-${selected.difficulty.toLowerCase()}`}>{selected.difficulty}</span>
+                <span className="mono modal-code">{selected.code}</span>
+              </div>
+              <h2>{selected.title}</h2>
+              <p className="modal-ministry"><Building2 size={14} /> {selected.ministry}</p>
+              <p className="modal-desc">{selected.description}</p>
+
+              <div className="modal-grid">
+                <div><span>Theme</span><strong>{selected.theme}</strong></div>
+                <div><span>Ideas submitted</span><strong>{selected.ideas}</strong></div>
+                <div><span>Prize</span><strong>{selected.prize}</strong></div>
+                <div><span>Eligibility</span><strong>{selected.eligibility}</strong></div>
+              </div>
+
+              <div className="modal-tags">
+                {selected.tags.map((t) => <span key={t} className="tag">{t}</span>)}
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  className={`btn btn-primary ${compare.includes(selected.id) ? 'active' : ''}`}
+                  onClick={() => toggleCompare(selected.id)}
+                >
+                  {compare.includes(selected.id) ? <Check size={16} /> : <Plus size={16} />}
+                  {compare.includes(selected.id) ? 'Added to compare' : 'Add to compare'}
+                </button>
+                <button className="btn btn-ghost" onClick={() => setSelected(null)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ COMPARE MODAL ============ */}
+      {showCompare && compareItems.length >= 2 && (
+        <div className="modal-backdrop" onClick={() => setShowCompare(false)}>
+          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+            <button className="modal-x" onClick={() => setShowCompare(false)} aria-label="Close">
+              <X size={20} />
+            </button>
+            <div className="modal-body">
+              <h2>Side-by-side comparison</h2>
+              <div className="compare-table">
+                <div className="ct-row ct-head">
+                  <div className="ct-label">Attribute</div>
+                  {compareItems.map((p) => <div key={p.id}>{p.code}</div>)}
+                </div>
+                {[
+                  ['Title', (p) => p.title],
+                  ['Type', (p) => p.type],
+                  ['Theme', (p) => p.theme],
+                  ['Difficulty', (p) => p.difficulty],
+                  ['Ministry', (p) => p.ministry.replace('Ministry of ', '')],
+                  ['Ideas', (p) => p.ideas],
+                  ['Prize', (p) => p.prize],
+                  ['Eligibility', (p) => p.eligibility],
+                ].map(([label, fn]) => (
+                  <div className="ct-row" key={label}>
+                    <div className="ct-label">{label}</div>
+                    {compareItems.map((p) => <div key={p.id}>{fn(p)}</div>)}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ REVIEW FORM MODAL ============ */}
+      {showReview && (
+        <ReviewFormModal
+          onClose={() => setShowReview(false)}
+          onSubmit={(review) => {
+            setReviews((prev) => [
+              { ...review, id: `r${Date.now()}`, date: 'just now' },
+              ...prev,
+            ])
+            setShowReview(false)
+            notify('Review submitted', 'Thanks for sharing your experience!')
+            setTimeout(() => scrollTo('reviews'), 200)
+          }}
+        />
+      )}
+
+      <Toast toast={toast} onClose={() => setToast(null)} />
+    </div>
+  )
+}
+
+/* =========================================================
+   REVIEW FORM MODAL
+   ========================================================= */
+function ReviewFormModal({ onClose, onSubmit }) {
+  const [form, setForm] = useState({
+    name: '', email: '', role: 'Student', rating: 0, title: '', message: '',
+  })
+  const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+
+  const set = (k, v) => {
+    setForm((f) => ({ ...f, [k]: v }))
+    if (errors[k]) setErrors((e) => ({ ...e, [k]: '' }))
+  }
+
+  const validate = () => {
+    const e = {}
+    if (!form.name.trim()) e.name = 'Please enter your name.'
+    if (!form.email.trim()) e.email = 'Please enter your email.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email address.'
+    if (!form.rating) e.rating = 'Please pick a rating.'
+    if (!form.title.trim()) e.title = 'Add a short headline.'
+    if (form.message.trim().length < 10) e.message = 'Review should be at least 10 characters.'
+    return e
+  }
+
+  const handleSubmit = (ev) => {
+    ev.preventDefault()
+    const e = validate()
+    setErrors(e)
+    if (Object.keys(e).length) return
+    setSubmitting(true)
+    // simulate a frontend submit
+    setTimeout(() => {
+      onSubmit({
+        name: form.name.trim(),
+        role: form.role,
+        rating: form.rating,
+        title: form.title.trim(),
+        message: form.message.trim(),
+      })
+    }, 500)
+  }
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal modal-form" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <button className="modal-x" onClick={onClose} aria-label="Close"><X size={20} /></button>
+        <div className="modal-body">
+          <span className="kicker mono">// Share your experience</span>
+          <h2>Write a review</h2>
+          <p className="form-sub">Your feedback helps future participants pick the right problem statement.</p>
+
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="form-row">
+              <label>
+                Full name
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => set('name', e.target.value)}
+                  placeholder="e.g. Ananya Sharma"
+                  className={errors.name ? 'err' : ''}
+                />
+                {errors.name && <span className="err-msg">{errors.name}</span>}
+              </label>
+
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => set('email', e.target.value)}
+                  placeholder="you@example.com"
+                  className={errors.email ? 'err' : ''}
+                />
+                {errors.email && <span className="err-msg">{errors.email}</span>}
+              </label>
+            </div>
+
+            <div className="form-row">
+              <label>
+                I am a
+                <select value={form.role} onChange={(e) => set('role', e.target.value)}>
+                  <option>Student</option>
+                  <option>Mentor</option>
+                  <option>Judge</option>
+                  <option>Organiser</option>
+                </select>
+              </label>
+
+              <label>
+                Overall rating
+                <div className="rating-row">
+                  <StarRating value={form.rating} onChange={(v) => set('rating', v)} />
+                  {form.rating > 0 && <span className="mono rating-num">{form.rating}/5</span>}
+                </div>
+                {errors.rating && <span className="err-msg">{errors.rating}</span>}
+              </label>
+            </div>
+
+            <label className="full">
+              Review headline
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) => set('title', e.target.value)}
+                placeholder="Sum it up in a line"
+                className={errors.title ? 'err' : ''}
+              />
+              {errors.title && <span className="err-msg">{errors.title}</span>}
+            </label>
+
+            <label className="full">
+              Your review
+              <textarea
+                rows={5}
+                value={form.message}
+                onChange={(e) => set('message', e.target.value)}
+                placeholder="What worked, what didn't, what you'd tell a new team…"
+                className={errors.message ? 'err' : ''}
+              />
+              {errors.message && <span className="err-msg">{errors.message}</span>}
+            </label>
+
+            <div className="form-actions">
+              <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? 'Submitting…' : <><Send size={16} /> Submit review</>}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
