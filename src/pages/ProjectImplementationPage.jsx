@@ -70,7 +70,7 @@ const GUIDELINES = [
   {
     icon: IndianRupee,
     title: 'Stipend & internship',
-    body: 'It is highly recommended that the department provide a monthly stipend and/or internship to all members of teams working on development. Each team member can be given a consolidated stipend of \u20B910,000\u2013\u20B915,000 per month for a period of 6 months (minimum). Note: a maximum of 6 students receive this stipend.',
+    body: 'It is highly recommended that the department provide a monthly stipend and/or internship to all members of teams working on development. Each team member can be given a consolidated stipend of 15,000 per month for a period of 6 months (minimum). Note: a maximum of 6 students receive this stipend.',
   },
   {
     icon: FileCheck,
