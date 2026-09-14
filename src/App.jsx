@@ -12,6 +12,10 @@ import KnowYourSpocPage from './pages/KnowYourSpocPage'
 import ProjectImplementationPage from './pages/ProjectImplementationPage'
 import FAQPage from './pages/FAQPage'
 import ArchivePage from './pages/ArchivePage'
+import IdeaTemplatePage from './pages/IdeaTemplatePage'
+import EvaluationRubricPage from './pages/EvaluationRubricPage'
+import PrototypeKitsPage from './pages/PrototypeKitsPage'
+import MentorOfficeHoursPage from './pages/MentorOfficeHoursPage'
 import HeroVideo from './components/HeroVideo'
 import MilestonesCarousel from './components/MilestonesCarousel'
 import OrganizingCommittee from './components/OrganizingCommittee'
@@ -249,24 +253,45 @@ function Toast({ toast, onClose }) {
   )
 }
 
+function BrandLogo({ size = 44, alt = 'Smart India Hackathon' }) {
+  const [status, setStatus] = useState('loading')
+  return (
+    <span className="brand-logo-wrap" style={{ width: size, height: size }}>
+      {status !== 'failed' && (
+        <img
+          src="/logos/sih-logo.svg"
+          alt={alt}
+          className="brand-logo"
+          onLoad={() => setStatus('ok')}
+          onError={() => {
+            console.warn('[BrandLogo] /logos/sih-logo.svg not found — using fallback mark')
+            setStatus('failed')
+          }}
+        />
+      )}
+      {status === 'failed' && (
+        <span className="brand-mark" aria-hidden="true">
+          <span className="bm-saffron" />
+          <span className="bm-green" />
+        </span>
+      )}
+    </span>
+  )
+}
+
 /* =========================================================
    APP
    ========================================================= */
 export default function App() {
-  /* ---- page routing ---- */
   const [page, setPage] = useState('home')
-
-  /* ---- nav ---- */
   const [menuOpen, setMenuOpen] = useState(false)
 
-  /* ---- explorer filters ---- */
   const [query, setQuery] = useState('')
   const [type, setType] = useState('All')
   const [theme, setTheme] = useState('All')
   const [difficulty, setDifficulty] = useState('All')
   const [sort, setSort] = useState('popular')
 
-  /* ---- modals / overlays ---- */
   const [selected, setSelected] = useState(null)
   const [compare, setCompare] = useState([])
   const [showCompare, setShowCompare] = useState(false)
@@ -275,26 +300,18 @@ export default function App() {
   const [showFindChallenge, setShowFindChallenge] = useState(false)
   const [faqOpen, setFaqOpen] = useState(null)
 
-  /* ---- tabs ---- */
   const [role, setRole] = useState('Student')
-
-  /* ---- reviews ---- */
   const [reviews, setReviews] = useState(SEED_REVIEWS)
 
-  /* ---- toast ---- */
   const [toast, setToast] = useState(null)
-  const notify = useCallback((title, msg) => {
-    setToast({ id: Date.now(), title, msg })
-  }, [])
+  const notify = useCallback((title, msg) => setToast({ id: Date.now(), title, msg }), [])
 
-  /* ---- lock body scroll when any overlay open ---- */
   const anyOverlay = !!selected || showCompare || showReview || showPresentation || showFindChallenge
   useEffect(() => {
     document.body.classList.toggle('no-scroll', anyOverlay)
     return () => document.body.classList.remove('no-scroll')
   }, [anyOverlay])
 
-  /* ---- journey timeline progress ---- */
   const journeyRef = useRef(null)
   const [journeyProgress, setJourneyProgress] = useState(0)
 
@@ -319,41 +336,34 @@ export default function App() {
     }
   }, [])
 
-  /* ---- esc closes overlays ---- */
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== 'Escape') return
-      setSelected(null)
-      setShowCompare(false)
-      setShowReview(false)
-      setShowPresentation(false)
-      setShowFindChallenge(false)
-      setMenuOpen(false)
+      setSelected(null); setShowCompare(false); setShowReview(false)
+      setShowPresentation(false); setShowFindChallenge(false); setMenuOpen(false)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  /* ---- scroll to top when switching pages ---- */
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' })
-  }, [page])
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'auto' }) }, [page])
 
-  /* ---- smooth scroll helper ---- */
   const scrollTo = useCallback((id) => {
     setMenuOpen(false)
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
 
-  /* ---- open pages ---- */
   const openProblems = useCallback(() => { setMenuOpen(false); setPage('problems') }, [])
   const openSpoc = useCallback(() => { setMenuOpen(false); setPage('spoc') }, [])
   const openImplementation = useCallback(() => { setMenuOpen(false); setPage('implementation') }, [])
   const openFAQ = useCallback(() => { setMenuOpen(false); setPage('faq') }, [])
   const openArchive = useCallback(() => { setMenuOpen(false); setPage('archive') }, [])
+  const openIdeaTemplate = useCallback(() => { setMenuOpen(false); setPage('idea-template') }, [])
+  const openRubric = useCallback(() => { setMenuOpen(false); setPage('rubric') }, [])
+  const openKits = useCallback(() => { setMenuOpen(false); setPage('kits') }, [])
+  const openMentor = useCallback(() => { setMenuOpen(false); setPage('mentor') }, [])
 
-  /* ---- filtering + sorting ---- */
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     let list = PROBLEMS.filter((p) => {
@@ -363,16 +373,13 @@ export default function App() {
       if (!q) return true
       const haystack = [
         p.title, p.ministry, p.category, p.theme, p.code,
-        p.type, p.difficulty, p.description,
-        ...(p.tags || []),
+        p.type, p.difficulty, p.description, ...(p.tags || []),
       ].join(' ').toLowerCase()
       return haystack.includes(q)
     })
-
     list = [...list].sort((a, b) => {
       if (sort === 'title') return a.title.localeCompare(b.title)
       if (sort === 'difficulty') return DIFF_ORDER[a.difficulty] - DIFF_ORDER[b.difficulty]
-      if (sort === 'ideas') return b.ideas - a.ideas
       return b.ideas - a.ideas
     })
     return list
@@ -385,14 +392,10 @@ export default function App() {
     setQuery(''); setType('All'); setTheme('All'); setDifficulty('All'); setSort('popular')
   }
 
-  /* ---- compare helpers ---- */
   const toggleCompare = (id) => {
     setCompare((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id)
-      if (prev.length >= 3) {
-        notify('Compare limit reached', 'You can compare up to 3 problems at once.')
-        return prev
-      }
+      if (prev.length >= 3) { notify('Compare limit reached', 'You can compare up to 3 problems at once.'); return prev }
       return [...prev, id]
     })
   }
@@ -401,7 +404,6 @@ export default function App() {
     [compare],
   )
 
-  /* ---- home page FAQs (shortlist) ---- */
   const FAQS = [
     { q: 'Who can participate in Smart India Hackathon?',
       a: 'Any full-time student enrolled in a recognised Indian institution (UG, PG, or PhD) can participate. Teams must have 6 members with at least one female member and a nominated mentor.' },
@@ -414,26 +416,20 @@ export default function App() {
   ]
 
   /* =========================================================
-     NON-HOME PAGE ROUTES
+     NON-HOME ROUTES
      ========================================================= */
-  if (page === 'spoc') {
-    return <KnowYourSpocPage onBack={() => setPage('home')} />
-  }
-  if (page === 'implementation') {
-    return <ProjectImplementationPage onBack={() => setPage('home')} />
-  }
-  if (page === 'faq') {
-    return <FAQPage onBack={() => setPage('home')} />
-  }
-  if (page === 'archive') {
-    return <ArchivePage onBack={() => setPage('home')} />
-  }
-  if (page === 'problems') {
-    return <ProblemsPage onBack={() => setPage('home')} />
-  }
+  if (page === 'spoc') return <KnowYourSpocPage onBack={() => setPage('home')} />
+  if (page === 'implementation') return <ProjectImplementationPage onBack={() => setPage('home')} />
+  if (page === 'faq') return <FAQPage onBack={() => setPage('home')} />
+  if (page === 'archive') return <ArchivePage onBack={() => setPage('home')} />
+  if (page === 'idea-template') return <IdeaTemplatePage onBack={() => setPage('home')} />
+  if (page === 'rubric') return <EvaluationRubricPage onBack={() => setPage('home')} />
+  if (page === 'kits') return <PrototypeKitsPage onBack={() => setPage('home')} />
+  if (page === 'mentor') return <MentorOfficeHoursPage onBack={() => setPage('home')} />
+  if (page === 'problems') return <ProblemsPage onBack={() => setPage('home')} />
 
   /* =========================================================
-     RENDER: HOME PAGE
+     RENDER: HOME
      ========================================================= */
   return (
     <div className="app">
@@ -441,10 +437,7 @@ export default function App() {
       <header className={`header ${menuOpen ? 'open' : ''}`}>
         <div className="header-inner">
           <button className="brand" onClick={() => scrollTo('top')} aria-label="Go to top">
-            <span className="brand-mark">
-              <span className="bm-saffron" />
-              <span className="bm-green" />
-            </span>
+            <BrandLogo size={44} />
             <span className="brand-text">
               <strong>Smart India</strong>
               <em>Hackathon</em>
@@ -477,10 +470,7 @@ export default function App() {
 
             <button className="nav-link" onClick={openFAQ}>FAQ</button>
 
-            <button
-              className="nav-link"
-              onClick={() => { setMenuOpen(false); setShowPresentation(true) }}
-            >
+            <button className="nav-link" onClick={() => { setMenuOpen(false); setShowPresentation(true) }}>
               <Presentation size={15} /> Deck
             </button>
 
@@ -506,21 +496,13 @@ export default function App() {
         <div className="hero-bg" aria-hidden="true">
           <div className="hero-grid" />
           <div className="hero-orbit">
-            <span className="orbit-ring r1" />
-            <span className="orbit-ring r2" />
-            <span className="orbit-ring r3" />
-            <span className="orbit-dot d1" />
-            <span className="orbit-dot d2" />
-            <span className="orbit-dot d3" />
+            <span className="orbit-ring r1" /><span className="orbit-ring r2" /><span className="orbit-ring r3" />
+            <span className="orbit-dot d1" /><span className="orbit-dot d2" /><span className="orbit-dot d3" />
           </div>
         </div>
 
         <div className="hero-inner">
-          <Reveal>
-            <span className="eyebrow mono">
-              <Sparkles size={13} /> 10th Edition · 2026
-            </span>
-          </Reveal>
+          <Reveal><span className="eyebrow mono"><Sparkles size={13} /> 10th Edition · 2026</span></Reveal>
           <Reveal delay={80}>
             <h1 className="hero-title">
               Where India&rsquo;s sharpest
@@ -530,7 +512,7 @@ export default function App() {
           </Reveal>
           <Reveal delay={160}>
             <p className="hero-sub">
-              Smart India Hackathon is the world's largest open innovation
+              Smart India Hackathon is the world&rsquo;s largest open innovation
               movement. Pick a real problem from a ministry, build a working
               prototype in 36 hours, and pitch it to a national jury.
             </p>
@@ -543,20 +525,13 @@ export default function App() {
               <button className="btn btn-hero-accent" onClick={() => setShowFindChallenge(true)}>
                 <Compass size={17} /> Find your challenge
               </button>
-              <button className="btn btn-ghost" onClick={() => scrollTo('journey')}>
-                How it works
-              </button>
+              <button className="btn btn-ghost" onClick={() => scrollTo('journey')}>How it works</button>
             </div>
           </Reveal>
 
           <Reveal delay={320}>
             <div className="hero-strip">
-              {[
-                ['Problems', 250, '+'],
-                ['Institutions', 5000, '+'],
-                ['Prize / team', 1, 'L'],
-                ['States', 36, ''],
-              ].map(([label, n, suf]) => (
+              {[['Problems', 250, '+'], ['Institutions', 5000, '+'], ['Prize / team', 1, 'L'], ['States', 36, '']].map(([label, n, suf]) => (
                 <div key={label} className="hero-stat">
                   <strong className="mono"><Counter to={n} suffix={suf} /></strong>
                   <span>{label}</span>
@@ -567,7 +542,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ HERO VIDEO ============ */}
       <HeroVideo />
 
       {/* ============ ABOUT ============ */}
@@ -589,17 +563,16 @@ export default function App() {
                   pressing challenges faced in everyday life. Launched in 2017
                   by the Ministry of Education&rsquo;s Innovation Cell (MIC) and
                   the All India Council for Technical Education (AICTE), SIH has
-                  grown into the <strong>world&rsquo;s largest open innovation
-                  platform</strong>.
+                  grown into the <strong>world&rsquo;s largest open innovation platform</strong>.
                 </p>
                 <p>
                   SIH provides a dynamic platform for students to develop and
                   showcase creative solutions to real-world problems sourced
-                  from ministries, state departments, PSUs, industries and
-                  NGOs. By encouraging participants to think critically and
-                  innovatively, the hackathon bridges the gap between academic
-                  knowledge and practical application — shifting students from
-                  marks-and-exams to problems-and-solutions.
+                  from ministries, state departments, PSUs, industries and NGOs.
+                  By encouraging participants to think critically and innovatively,
+                  the hackathon bridges the gap between academic knowledge and
+                  practical application — shifting students from marks-and-exams
+                  to problems-and-solutions.
                 </p>
                 <p>
                   Each edition builds on the previous one, refining its approach
@@ -628,15 +601,8 @@ export default function App() {
               <div className="about-aside">
                 <div className="aa-card aa-quote">
                   <span className="aa-mark">&ldquo;</span>
-                  <p>
-                    Through Smart India Hackathon, the youth power of the
-                    country is extracting the Amrit of solutions for developed
-                    India.
-                  </p>
-                  <span className="aa-author">
-                    — Shri Narendra Modi<br />
-                    <em>Hon&rsquo;ble Prime Minister of India</em>
-                  </span>
+                  <p>Through Smart India Hackathon, the youth power of the country is extracting the Amrit of solutions for developed India.</p>
+                  <span className="aa-author">— Shri Narendra Modi<br /><em>Hon&rsquo;ble Prime Minister of India</em></span>
                 </div>
                 <div className="aa-card aa-mission">
                   <h4>Our Mission</h4>
@@ -686,7 +652,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ FIND YOUR CHALLENGE (invitation band) ============ */}
+      {/* ============ FIND YOUR CHALLENGE BAND ============ */}
       <section className="section fyc-band-section" id="find-challenge">
         <div className="container">
           <Reveal>
@@ -706,9 +672,7 @@ export default function App() {
                   <button className="btn btn-primary" onClick={() => setShowFindChallenge(true)}>
                     <Compass size={16} /> Start the quiz
                   </button>
-                  <button className="btn btn-ghost" onClick={openProblems}>
-                    Browse all problems
-                  </button>
+                  <button className="btn btn-ghost" onClick={openProblems}>Browse all problems</button>
                 </div>
               </div>
 
@@ -733,7 +697,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ MILESTONES CAROUSEL ============ */}
       <MilestonesCarousel />
 
       {/* ============ EXPLORER ============ */}
@@ -751,60 +714,43 @@ export default function App() {
             <div className="filter-bar">
               <div className="search-wrap">
                 <Search size={17} className="search-icon" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search by title, ministry, tag, code…"
-                  aria-label="Search problem statements"
-                />
+                <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by title, ministry, tag, code…" aria-label="Search problem statements" />
                 {query && (
-                  <button className="clear-btn" onClick={() => setQuery('')} aria-label="Clear search">
-                    <X size={14} />
-                  </button>
+                  <button className="clear-btn" onClick={() => setQuery('')} aria-label="Clear search"><X size={14} /></button>
                 )}
               </div>
 
               <div className="filter-row">
                 <div className="chip-group" role="group" aria-label="Type filter">
                   {['All', 'Software', 'Hardware'].map((t) => (
-                    <button key={t} className={`chip ${type === t ? 'on' : ''}`} onClick={() => setType(t)}>
-                      {t}
-                    </button>
+                    <button key={t} className={`chip ${type === t ? 'on' : ''}`} onClick={() => setType(t)}>{t}</button>
                   ))}
                 </div>
-
                 <div className="chip-group" role="group" aria-label="Difficulty filter">
                   {['All', 'Easy', 'Medium', 'Hard'].map((d) => (
-                    <button key={d} className={`chip ${difficulty === d ? 'on' : ''}`} onClick={() => setDifficulty(d)}>
-                      {d}
-                    </button>
+                    <button key={d} className={`chip ${difficulty === d ? 'on' : ''}`} onClick={() => setDifficulty(d)}>{d}</button>
                   ))}
                 </div>
-
                 <select className="select" value={theme} onChange={(e) => setTheme(e.target.value)} aria-label="Theme filter">
                   <option value="All">All themes</option>
                   {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
-
                 <select className="select" value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort by">
                   <option value="popular">Most ideas</option>
                   <option value="ideas">Fewest ideas</option>
                   <option value="title">A → Z</option>
                   <option value="difficulty">Easiest first</option>
                 </select>
-
                 {activeFilterCount > 0 && (
-                  <button className="btn-reset" onClick={resetFilters}>
-                    <X size={14} /> Clear ({activeFilterCount})
-                  </button>
+                  <button className="btn-reset" onClick={resetFilters}><X size={14} /> Clear ({activeFilterCount})</button>
                 )}
               </div>
 
               <div className="results-line">
                 <Filter size={14} />
                 <span>
-                  Showing <strong>6</strong> of 226 problem statements
+                  Showing <strong>{filtered.length}</strong> of {PROBLEMS.length} problem statements
                   {' · '}
                   <button className="link-inline" onClick={openProblems}>View all →</button>
                 </span>
@@ -815,8 +761,7 @@ export default function App() {
           {filtered.length === 0 ? (
             <Reveal>
               <div className="empty">
-                <Search size={32} />
-                <h3>No matches found</h3>
+                <Search size={32} /><h3>No matches found</h3>
                 <p>Try a different keyword or clear the filters to see everything.</p>
                 <button className="btn btn-primary" onClick={resetFilters}>Reset filters</button>
               </div>
@@ -835,9 +780,7 @@ export default function App() {
                       <span className="mono pc-code">{p.code} · {p.theme}</span>
                       <h3>{p.title}</h3>
                       <p className="pc-desc">{p.description}</p>
-                      <div className="pc-tags">
-                        {p.tags.map((t) => <span key={t} className="tag">{t}</span>)}
-                      </div>
+                      <div className="pc-tags">{p.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>
                       <div className="pc-meta">
                         <span><Building2 size={13} /> {p.ministry.replace('Ministry of ', '')}</span>
                         <span><Lightbulb size={13} /> {p.ideas}</span>
@@ -861,7 +804,7 @@ export default function App() {
             <Reveal>
               <div className="preview-cta">
                 <button className="btn btn-primary" onClick={openProblems}>
-                  View all 226 problem statements <ArrowRight size={16} />
+                  View all {filtered.length} problem statements <ArrowRight size={16} />
                 </button>
               </div>
             </Reveal>
@@ -884,7 +827,6 @@ export default function App() {
             <div className="jt-rail" aria-hidden="true">
               <div className="jt-rail-fill" style={{ height: `${journeyProgress}%` }} />
             </div>
-
             {JOURNEY.map((j, i) => {
               const Icon = j.icon
               return (
@@ -893,17 +835,13 @@ export default function App() {
                   <div className="jt-card">
                     <div className="jt-card-top">
                       <span className="mono jt-step">STEP {j.step}</span>
-                      <span className={`jt-status jt-status-${j.status}`}>
-                        {j.status === 'open' ? 'Open now' : 'Upcoming'}
-                      </span>
+                      <span className={`jt-status jt-status-${j.status}`}>{j.status === 'open' ? 'Open now' : 'Upcoming'}</span>
                     </div>
                     <span className="mono jt-date">{j.date}</span>
                     <span className="jt-phase">{j.phase}</span>
                     <h3>{j.title}</h3>
                     <p>{j.desc}</p>
-                    <div className="jt-tags">
-                      {j.tags.map((t) => <span key={t} className="jt-tag">{t}</span>)}
-                    </div>
+                    <div className="jt-tags">{j.tags.map((t) => <span key={t} className="jt-tag">{t}</span>)}</div>
                   </div>
                 </Reveal>
               )
@@ -936,7 +874,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ THEMES CAROUSEL ============ */}
+      {/* ============ THEMES ============ */}
       <section className="section section-alt" id="themes">
         <div className="container">
           <Reveal>
@@ -946,14 +884,10 @@ export default function App() {
               <p>Swipe through the thematic areas and pick the one that fits you best.</p>
             </div>
           </Reveal>
-
           <Reveal delay={80}>
             <ThemesCarousel
               activeTheme={theme}
-              onPick={(t) => {
-                setTheme(t)
-                setTimeout(() => scrollTo('explorer'), 80)
-              }}
+              onPick={(t) => { setTheme(t); setTimeout(() => scrollTo('explorer'), 80) }}
             />
           </Reveal>
         </div>
@@ -984,11 +918,7 @@ export default function App() {
               {role === 'Student' && (
                 <>
                   <h3>Build something that ships</h3>
-                  <p>
-                    Form a team of six, choose a problem statement, and prototype
-                    alongside mentors from the sponsoring ministry. Winners receive
-                    ₹1,00,000 and incubation support.
-                  </p>
+                  <p>Form a team of six, choose a problem statement, and prototype alongside mentors from the sponsoring ministry. Winners receive ₹1,00,000 and incubation support.</p>
                   <ul className="role-list">
                     <li><Check size={15} /> Open to all UG, PG and PhD students</li>
                     <li><Check size={15} /> No registration fee</li>
@@ -999,10 +929,7 @@ export default function App() {
               {role === 'Mentor' && (
                 <>
                   <h3>Guide the next generation</h3>
-                  <p>
-                    Mentors review submissions, run office hours during the finale,
-                    and help teams translate prototypes into deployable pilots.
-                  </p>
+                  <p>Mentors review submissions, run office hours during the finale, and help teams translate prototypes into deployable pilots.</p>
                   <ul className="role-list">
                     <li><Check size={15} /> Industry or academic professionals</li>
                     <li><Check size={15} /> Commit ~6 hours across the finale weekend</li>
@@ -1013,10 +940,7 @@ export default function App() {
               {role === 'Judge' && (
                 <>
                   <h3>Decide what moves forward</h3>
-                  <p>
-                    Judges score prototypes on innovation, feasibility, impact and
-                    scalability, then defend their rankings to the national panel.
-                  </p>
+                  <p>Judges score prototypes on innovation, feasibility, impact and scalability, then defend their rankings to the national panel.</p>
                   <ul className="role-list">
                     <li><Check size={15} /> Domain experts and ministry officials</li>
                     <li><Check size={15} /> Structured rubric-based evaluation</li>
@@ -1085,19 +1009,19 @@ export default function App() {
             <Reveal delay={60}>
               <div className="resource-cards">
                 {[
-                  { icon: BookOpen, title: 'Idea Submission Template', desc: 'The exact deck structure the jury expects.' },
-                  { icon: Target, title: 'Evaluation Rubric', desc: 'How innovation, impact and feasibility are scored.' },
-                  { icon: Rocket, title: 'Prototype Starter Kits', desc: 'Boilerplates, datasets and APIs by theme.' },
-                  { icon: Zap, title: 'Mentor Office Hours', desc: 'Book slots with ministry-appointed mentors.' },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="resource-card">
+                  { icon: BookOpen, title: 'Idea Submission Template', desc: 'The exact deck structure the jury expects.', action: openIdeaTemplate },
+                  { icon: Target, title: 'Evaluation Rubric', desc: 'How innovation, impact and feasibility are scored.', action: openRubric },
+                  { icon: Rocket, title: 'Prototype Starter Kits', desc: 'Boilerplates, datasets and APIs by theme.', action: openKits },
+                  { icon: Zap, title: 'Mentor Office Hours', desc: 'Book slots with ministry-appointed mentors.', action: openMentor },
+                ].map(({ icon: Icon, title, desc, action }) => (
+                  <button key={title} className="resource-card" onClick={action}>
                     <div className="rc-icon"><Icon size={18} /></div>
                     <div>
                       <h4>{title}</h4>
                       <p>{desc}</p>
                     </div>
                     <ArrowUpRight size={16} className="rc-arrow" />
-                  </div>
+                  </button>
                 ))}
               </div>
             </Reveal>
@@ -1123,23 +1047,15 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ ORGANIZING COMMITTEE ============ */}
       <OrganizingCommittee />
-
-      {/* ============ WHY SIH MATTERS ============ */}
       <WhySIHMatters />
-
-      {/* ============ CONTACT ============ */}
       <ContactSection />
 
       {/* ============ FOOTER ============ */}
       <footer className="footer">
         <div className="container footer-inner">
           <div className="footer-brand">
-            <span className="brand-mark">
-              <span className="bm-saffron" />
-              <span className="bm-green" />
-            </span>
+            <BrandLogo size={40} />
             <div>
               <strong>Smart India Hackathon</strong>
               <p className="mono">A student redesign concept · Not an official platform</p>
@@ -1159,9 +1075,12 @@ export default function App() {
               <h5>Resources</h5>
               <button onClick={openArchive}>Editions archive</button>
               <button onClick={openImplementation}>Project Implementation</button>
+              <button onClick={openIdeaTemplate}>Idea template</button>
+              <button onClick={openRubric}>Evaluation rubric</button>
+              <button onClick={openKits}>Prototype kits</button>
+              <button onClick={openMentor}>Mentor office hours</button>
               <button onClick={openFAQ}>FAQ</button>
               <button onClick={() => setShowPresentation(true)}>Presentation deck</button>
-              <button onClick={() => scrollTo('contact')}>Contact Us</button>
             </div>
             <div>
               <h5>Engage</h5>
@@ -1170,6 +1089,7 @@ export default function App() {
               <button onClick={() => scrollTo('reviews')}>Read reviews</button>
               <button onClick={() => scrollTo('participate')}>Participate</button>
               <button onClick={() => scrollTo('committee')}>Organising team</button>
+              <button onClick={() => scrollTo('contact')}>Contact Us</button>
             </div>
           </div>
         </div>
@@ -1194,9 +1114,7 @@ export default function App() {
             </div>
             <div className="dock-actions">
               <button className="btn btn-sm btn-ghost" onClick={() => setCompare([])}>Clear</button>
-              <button className="btn btn-sm btn-primary" disabled={compare.length < 2} onClick={() => setShowCompare(true)}>
-                Compare now
-              </button>
+              <button className="btn btn-sm btn-primary" disabled={compare.length < 2} onClick={() => setShowCompare(true)}>Compare now</button>
             </div>
           </div>
         </div>
@@ -1216,18 +1134,13 @@ export default function App() {
               <h2>{selected.title}</h2>
               <p className="modal-ministry"><Building2 size={14} /> {selected.ministry}</p>
               <p className="modal-desc">{selected.description}</p>
-
               <div className="modal-grid">
                 <div><span>Theme</span><strong>{selected.theme}</strong></div>
                 <div><span>Ideas submitted</span><strong>{selected.ideas}</strong></div>
                 <div><span>Prize</span><strong>{selected.prize}</strong></div>
                 <div><span>Eligibility</span><strong>{selected.eligibility}</strong></div>
               </div>
-
-              <div className="modal-tags">
-                {selected.tags.map((t) => <span key={t} className="tag">{t}</span>)}
-              </div>
-
+              <div className="modal-tags">{selected.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>
               <div className="modal-actions">
                 <button className={`btn btn-primary ${compare.includes(selected.id) ? 'active' : ''}`} onClick={() => toggleCompare(selected.id)}>
                   {compare.includes(selected.id) ? <Check size={16} /> : <Plus size={16} />}
@@ -1253,14 +1166,9 @@ export default function App() {
                   {compareItems.map((p) => <div key={p.id}>{p.code}</div>)}
                 </div>
                 {[
-                  ['Title', (p) => p.title],
-                  ['Type', (p) => p.type],
-                  ['Theme', (p) => p.theme],
-                  ['Difficulty', (p) => p.difficulty],
-                  ['Ministry', (p) => p.ministry.replace('Ministry of ', '')],
-                  ['Ideas', (p) => p.ideas],
-                  ['Prize', (p) => p.prize],
-                  ['Eligibility', (p) => p.eligibility],
+                  ['Title', (p) => p.title], ['Type', (p) => p.type], ['Theme', (p) => p.theme],
+                  ['Difficulty', (p) => p.difficulty], ['Ministry', (p) => p.ministry.replace('Ministry of ', '')],
+                  ['Ideas', (p) => p.ideas], ['Prize', (p) => p.prize], ['Eligibility', (p) => p.eligibility],
                 ].map(([label, fn]) => (
                   <div className="ct-row" key={label}>
                     <div className="ct-label">{label}</div>
@@ -1273,7 +1181,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ============ REVIEW FORM MODAL ============ */}
+      {/* ============ REVIEW FORM ============ */}
       {showReview && (
         <ReviewFormModal
           onClose={() => setShowReview(false)}
@@ -1291,11 +1199,11 @@ export default function App() {
         open={showPresentation}
         onClose={() => setShowPresentation(false)}
         title="Smart India Hackathon — Official Deck"
-        embedUrl="https://docs.google.com/presentation/d/REPLACE_WITH_YOUR_ID/embed?start=false&loop=false"
+        embedUrl="/sih-2026-deck.pdf"
         downloadUrl="/sih-2026-deck.pdf"
       />
 
-      {/* ============ FIND YOUR CHALLENGE WIZARD ============ */}
+      {/* ============ FIND YOUR CHALLENGE ============ */}
       <FindYourChallenge
         open={showFindChallenge}
         onClose={() => setShowFindChallenge(false)}
@@ -1339,13 +1247,8 @@ function ReviewFormModal({ onClose, onSubmit }) {
     if (Object.keys(e).length) return
     setSubmitting(true)
     setTimeout(() => {
-      onSubmit({
-        name: form.name.trim(),
-        role: form.role,
-        rating: form.rating,
-        title: form.title.trim(),
-        message: form.message.trim(),
-      })
+      onSubmit({ name: form.name.trim(), role: form.role, rating: form.rating,
+        title: form.title.trim(), message: form.message.trim() })
     }, 500)
   }
 
@@ -1360,15 +1263,12 @@ function ReviewFormModal({ onClose, onSubmit }) {
 
           <form onSubmit={handleSubmit} noValidate>
             <div className="form-row">
-              <label>
-                Full name
+              <label>Full name
                 <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)}
                   placeholder="e.g. Ananya Sharma" className={errors.name ? 'err' : ''} />
                 {errors.name && <span className="err-msg">{errors.name}</span>}
               </label>
-
-              <label>
-                Email
+              <label>Email
                 <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)}
                   placeholder="you@example.com" className={errors.email ? 'err' : ''} />
                 {errors.email && <span className="err-msg">{errors.email}</span>}
@@ -1376,18 +1276,12 @@ function ReviewFormModal({ onClose, onSubmit }) {
             </div>
 
             <div className="form-row">
-              <label>
-                I am a
+              <label>I am a
                 <select value={form.role} onChange={(e) => set('role', e.target.value)}>
-                  <option>Student</option>
-                  <option>Mentor</option>
-                  <option>Judge</option>
-                  <option>Organiser</option>
+                  <option>Student</option><option>Mentor</option><option>Judge</option><option>Organiser</option>
                 </select>
               </label>
-
-              <label>
-                Overall rating
+              <label>Overall rating
                 <div className="rating-row">
                   <StarRating value={form.rating} onChange={(v) => set('rating', v)} />
                   {form.rating > 0 && <span className="mono rating-num">{form.rating}/5</span>}
@@ -1396,15 +1290,13 @@ function ReviewFormModal({ onClose, onSubmit }) {
               </label>
             </div>
 
-            <label className="full">
-              Review headline
+            <label className="full">Review headline
               <input type="text" value={form.title} onChange={(e) => set('title', e.target.value)}
                 placeholder="Sum it up in a line" className={errors.title ? 'err' : ''} />
               {errors.title && <span className="err-msg">{errors.title}</span>}
             </label>
 
-            <label className="full">
-              Your review
+            <label className="full">Your review
               <textarea rows={5} value={form.message} onChange={(e) => set('message', e.target.value)}
                 placeholder="What worked, what didn't, what you'd tell a new team…" className={errors.message ? 'err' : ''} />
               {errors.message && <span className="err-msg">{errors.message}</span>}
