@@ -1,21 +1,39 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
-export default function BrandLogo({ size = 44, alt = 'Smart India Hackathon' }) {
-  const [status, setStatus] = useState('loading')
+export default function BrandLogo({
+  size = 44,
+  alt = "Smart India Hackathon",
+}) {
+  const [failed, setFailed] = useState(false);
+
   return (
-    <span className="brand-logo-wrap" style={{ width: size, height: size }}>
-      {status !== 'failed' && (
-        <img src="/logos/sih-logo.svg" alt={alt} className="brand-logo"
-          onLoad={() => setStatus('ok')}
-          onError={() => { console.warn('[BrandLogo] /logos/sih-logo.svg not found — using fallback mark'); setStatus('failed') }} />
-      )}
-      {status === 'failed' && (
-        <span className="brand-mark" aria-hidden="true">
-          <span className="bm-saffron" /><span className="bm-green" />
+    <span
+      className="brand-logo-wrap"
+      aria-label={alt}
+    >
+      {!failed ? (
+        <img
+          src="/logos/sih-logo.svg"
+          alt={alt}
+          className="brand-logo"
+          onError={() => {
+            console.warn(
+              "[BrandLogo] Failed to load /logos/sih-logo.svg"
+            );
+            setFailed(true);
+          }}
+        />
+      ) : (
+        <span
+          className="brand-mark"
+          aria-hidden="true"
+        >
+          <span className="bm-saffron" />
+          <span className="bm-green" />
         </span>
       )}
     </span>
-  )
+  );
 }
