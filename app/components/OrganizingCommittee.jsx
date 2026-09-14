@@ -32,75 +32,117 @@ const COMMITTEE = [
 ]
 
 const ORGANISERS = [
-  { name: 'Ministry of Education\u2019s Innovation Cell', short: 'MIC',   logo: '/logos/mic.png' },
-  { name: 'All India Council for Technical Education',    short: 'AICTE', logo: '/logos/aicte.png' },
-  { name: 'Inter Institutional Inclusive Innovations Center', short: 'i4C', logo: '/logos/i4c.png' },
-]
+  {
+    name: "Ministry of Education's Innovation Cell",
+    short: "MIE",
+    logo: "/logos/moe.png",
+  },
+  {
+    name: "All India Council for Technical Education",
+    short: "AICTE",
+    logo: "/logos/aicte.png",
+  },
+  {
+    name: "Inter Institutional Inclusive Innovations Center",
+    short: "i4C",
+    logo: "/logos/i4c.png",
+  },
+];
 
 const MOE_LOGO = '/logos/moe.png'
 
 function initials(name) {
   return name
-    .replace(/^(Shri|Smt\.?|Dr\.?|Prof\.?|Mr\.?|Ms\.?)\s+/i, '')
-    .split(' ')
+    .replace(
+      /^(Shri|Smt\.?|Dr\.?|Prof\.?|Mr\.?|Ms\.?)\s+/i,
+      ""
+    )
+    .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
+    .map((word) => word.charAt(0))
+    .join("")
+    .toUpperCase();
 }
 
 function Avatar({ name, photo, size = 48 }) {
-  const [loaded, setLoaded] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const [failed, setFailed] = useState(false);
 
   return (
-    <div className="ct-avatar" style={{ width: size, height: size }} aria-hidden="true">
-      <span className="ct-avatar-initials">{initials(name)}</span>
+    <div
+      className="ct-avatar"
+      style={{
+        width: size,
+        height: size,
+      }}
+      aria-label={name}
+    >
+      {/* Fallback initials */}
+      <span className="ct-avatar-initials">
+        {initials(name)}
+      </span>
+
+      {/* Real photo */}
       {photo && !failed && (
         <img
           src={photo}
-          alt={name}
-          className={`ct-avatar-img ${loaded ? 'loaded' : ''}`}
-          onLoad={() => setLoaded(true)}
+          alt=""
+          className="ct-avatar-img"
+          loading="eager"
+          decoding="async"
           onError={() => {
-            console.warn(`[Committee] photo not found: ${photo}`)
-            setFailed(true)
+            console.error(
+              `[Committee] Failed to load: ${photo}`
+            );
+            setFailed(true);
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
 function OrgLogo({ src, short }) {
-  const [failed, setFailed] = useState(false)
+  const [failed, setFailed] = useState(false);
+
   return (
     <div className="org-logo">
-      {!failed && (
-        <img src={src} alt={short} onError={() => {
-          console.warn(`[Organiser] logo not found: ${src}`)
-          setFailed(true)
-        }} />
+      {!failed ? (
+        <img
+          src={src}
+          alt={`${short} logo`}
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <div className="org-logo-fallback">
+          <span>{short}</span>
+        </div>
       )}
-      {failed && <span className="org-logo-fallback">{short}</span>}
     </div>
-  )
+  );
 }
 
 function MoeEmblem() {
-  const [failed, setFailed] = useState(false)
-  if (failed) return null
+  const [failed, setFailed] = useState(false);
+
   return (
-    <img
-      src={MOE_LOGO}
-      alt="Ministry of Education"
-      onError={() => {
-        console.warn(`[Organiser] MoE logo not found: ${MOE_LOGO}`)
-        setFailed(true)
-      }}
-    />
-  )
+    <div className="moe-logo-wrapper">
+      {!failed ? (
+        <img
+          src="/logos/moe.png"
+          alt="Ministry of Education"
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <div className="moe-fallback">
+          <span>MINISTRY OF EDUCATION</span>
+          <small>GOVERNMENT OF INDIA</small>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function OrganizingCommittee() {

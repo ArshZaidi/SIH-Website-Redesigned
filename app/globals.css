@@ -5074,3 +5074,517 @@ textarea {
 .brand-logo-text {
   display: none;
 }
+
+/* =========================================================
+   ORGANISER LOGOS — ROBUST
+========================================================= */
+
+.org-logo {
+  width: 64px;
+  height: 64px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+
+  background: var(--panel-2);
+
+  overflow: hidden;
+}
+
+.org-logo img {
+  display: block;
+
+  width: 80%;
+  height: 80%;
+
+  object-fit: contain;
+}
+
+.org-logo-fallback {
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  color: var(--saffron);
+
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+
+/* Ministry of Education */
+
+.organisers-moe {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  min-height: 70px;
+
+  margin-bottom: 28px;
+}
+
+.moe-logo-wrapper {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 60px;
+}
+
+.moe-logo-wrapper img {
+  display: block;
+
+  max-width: 180px;
+  max-height: 70px;
+
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
+}
+
+.moe-fallback {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 12px 22px;
+
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+
+  background: var(--panel-2);
+
+  text-align: center;
+}
+
+.moe-fallback span {
+  color: rgba(255, 255, 255, 0.75);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 10px;
+
+  letter-spacing: 0.1em;
+}
+
+.moe-fallback small {
+  color: rgba(255, 255, 255, 0.35);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 8px;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* =========================================================
+   ORGANISERS — FIXED CARD SIZING
+   Does NOT affect avatars
+========================================================= */
+
+.organisers-block {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 42px;
+
+  padding: 32px 36px 36px;
+
+  border: 1px solid var(--line-strong);
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  overflow: hidden;
+}
+
+
+/* subtle glow */
+
+.organisers-block::before {
+  content: "";
+
+  position: absolute;
+
+  top: -120px;
+  right: 10%;
+
+  width: 280px;
+  height: 180px;
+
+  border-radius: 50%;
+
+  background: var(--saffron);
+
+  opacity: 0.06;
+
+  filter: blur(80px);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.organisers-header {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+
+  color: var(--saffron);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 12px;
+
+  font-weight: 500;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.organisers-header svg {
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   MOE LOGO
+========================================================= */
+
+.organisers-moe {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  min-height: 82px;
+
+  padding: 8px 0 22px;
+
+  margin-bottom: 24px;
+
+  border-bottom: 1px solid var(--line);
+}
+
+.moe-logo-wrapper {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  height: 70px;
+}
+
+.moe-logo-wrapper img {
+  display: block;
+
+  width: auto;
+
+  max-width: 190px;
+
+  height: auto;
+
+  max-height: 65px;
+
+  object-fit: contain;
+}
+
+
+/* fallback */
+
+.moe-fallback {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 4px;
+
+  text-align: center;
+}
+
+.moe-fallback span {
+  color: rgba(255, 255, 255, 0.7);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 9px;
+
+  letter-spacing: 0.1em;
+}
+
+.moe-fallback small {
+  color: rgba(255, 255, 255, 0.3);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 7px;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* =========================================================
+   ORGANISER ROW
+========================================================= */
+
+.organisers-row {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+
+  width: 100%;
+}
+
+
+/* =========================================================
+   ORGANISER CARD
+========================================================= */
+
+.organiser-card {
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  min-width: 0;
+
+  width: 100%;
+
+  min-height: 118px;
+
+  padding: 20px;
+
+  border: 1px solid var(--line);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.organiser-card:hover {
+  transform: translateY(-4px);
+
+  border-color:
+    rgba(216, 141, 82, 0.45);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.22);
+}
+
+
+/* =========================================================
+   LOGO BOX
+========================================================= */
+
+.org-logo {
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 70px;
+
+  width: 70px;
+  height: 70px;
+
+  border: 1px solid var(--line-strong);
+
+  border-radius: 16px;
+
+  background:
+    rgba(255, 255, 255, 0.94);
+
+  overflow: hidden;
+}
+
+.org-logo img {
+  display: block;
+
+  width: 82%;
+  height: 82%;
+
+  object-fit: contain;
+}
+
+
+/* fallback logo */
+
+.org-logo-fallback {
+  display: grid;
+
+  place-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  color: var(--saffron);
+
+  font-family: "DM Mono", monospace;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.06em;
+}
+
+
+/* =========================================================
+   ORGANISER TEXT
+========================================================= */
+
+.org-info {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.org-info strong {
+  display: block;
+
+  color: var(--text);
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  line-height: 1.1;
+}
+
+.org-info span {
+  display: block;
+
+  color: var(--muted);
+
+  font-size: 11px;
+
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+  .organisers-row {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .organiser-card {
+    min-height: 110px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 620px) {
+  .organisers-block {
+    padding: 25px 20px 24px;
+
+    border-radius: 18px;
+  }
+
+  .organisers-row {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .organiser-card {
+    min-height: 96px;
+
+    padding: 15px;
+
+    gap: 15px;
+  }
+
+  .org-logo {
+    flex-basis: 60px;
+
+    width: 60px;
+    height: 60px;
+
+    border-radius: 14px;
+  }
+
+  .org-info strong {
+    font-size: 16px;
+  }
+
+  .org-info span {
+    font-size: 10px;
+  }
+
+  .moe-logo-wrapper {
+    height: 58px;
+  }
+
+  .moe-logo-wrapper img {
+    max-width: 165px;
+
+    max-height: 55px;
+  }
+}
