@@ -4,14 +4,20 @@ import {
   Users, Cpu, Lightbulb, Trophy, Calendar, Mail, Send, Sparkles,
   BookOpen, Building2, Target, Rocket, GraduationCap, Gavel, Plus,
   MessageSquare, Zap, Filter, Award, Layers, MapPin, ExternalLink, UserCheck,
+  Presentation,
 } from 'lucide-react'
 import './App.css'
 import ProblemsPage from './pages/ProblemsPage'
 import KnowYourSpocPage from './pages/KnowYourSpocPage'
+import ProjectImplementationPage from './pages/ProjectImplementationPage'
+import FAQPage from './pages/FAQPage'
 import HeroVideo from './components/HeroVideo'
 import MilestonesCarousel from './components/MilestonesCarousel'
 import OrganizingCommittee from './components/OrganizingCommittee'
 import WhySIHMatters from './components/WhySIHMatters'
+import ThemesCarousel from './components/ThemesCarousel'
+import ContactSection from './components/ContactSection'
+import PresentationModal from './components/PresentationModal'
 
 /* =========================================================
    DATA
@@ -125,9 +131,7 @@ const TIMELINE = [
 
 const JOURNEY = [
   {
-    step: '01',
-    phase: 'Registration',
-    date: 'Aug 01 — Aug 20',
+    step: '01', phase: 'Registration', date: 'Aug 01 — Aug 20',
     title: 'Register your team',
     desc: 'Form a team of six with at least one female member, nominate a faculty mentor, and lock your preferred problem statements on the portal.',
     icon: Users,
@@ -135,9 +139,7 @@ const JOURNEY = [
     status: 'open',
   },
   {
-    step: '02',
-    phase: 'Ideation',
-    date: 'Aug 20 — Sep 05',
+    step: '02', phase: 'Ideation', date: 'Aug 20 — Sep 05',
     title: 'Submit your idea',
     desc: 'Pitch a five-slide deck covering problem understanding, proposed solution, tech stack, feasibility and expected impact. Institute-level judges shortlist.',
     icon: Lightbulb,
@@ -145,9 +147,7 @@ const JOURNEY = [
     status: 'open',
   },
   {
-    step: '03',
-    phase: 'Shortlist',
-    date: 'Sep 05 — Sep 20',
+    step: '03', phase: 'Shortlist', date: 'Sep 05 — Sep 20',
     title: 'Campus evaluation',
     desc: 'The institutional SPOC and evaluation panel score every submission on innovation, feasibility and clarity. Top teams per college advance to the finale.',
     icon: Target,
@@ -155,9 +155,7 @@ const JOURNEY = [
     status: 'upcoming',
   },
   {
-    step: '04',
-    phase: 'Build',
-    date: 'Sep 25 — Sep 27',
+    step: '04', phase: 'Build', date: 'Sep 25 — Sep 27',
     title: '36-hour grand finale',
     desc: 'Two rounds of non-stop prototyping with domain mentors on the floor. Ship a working demo — repository, walkthrough video and live demo.',
     icon: Cpu,
@@ -165,9 +163,7 @@ const JOURNEY = [
     status: 'upcoming',
   },
   {
-    step: '05',
-    phase: 'Pitch',
-    date: 'Sep 27',
+    step: '05', phase: 'Pitch', date: 'Sep 27',
     title: 'National jury pitch',
     desc: 'Finalists present live to the national jury — eight minutes to demo, four minutes of Q&A. Judged on impact, scalability and execution quality.',
     icon: Trophy,
@@ -175,9 +171,7 @@ const JOURNEY = [
     status: 'upcoming',
   },
   {
-    step: '06',
-    phase: 'Rewards',
-    date: 'Oct 10',
+    step: '06', phase: 'Rewards', date: 'Oct 10',
     title: 'Winners announced',
     desc: 'Each winning team receives ₹1,00,000 along with incubation support, dedicated mentorship and fast-tracked ministry pilot opportunities.',
     icon: Award,
@@ -334,7 +328,7 @@ function Toast({ toast, onClose }) {
    ========================================================= */
 export default function App() {
   /* ---- page routing ---- */
-  const [page, setPage] = useState('home') // 'home' | 'problems' | 'spoc'
+  const [page, setPage] = useState('home') // 'home' | 'problems' | 'spoc' | 'implementation' | 'faq'
 
   /* ---- nav ---- */
   const [menuOpen, setMenuOpen] = useState(false)
@@ -351,6 +345,7 @@ export default function App() {
   const [compare, setCompare] = useState([])
   const [showCompare, setShowCompare] = useState(false)
   const [showReview, setShowReview] = useState(false)
+  const [showPresentation, setShowPresentation] = useState(false)
   const [faqOpen, setFaqOpen] = useState(null)
 
   /* ---- tabs ---- */
@@ -366,7 +361,7 @@ export default function App() {
   }, [])
 
   /* ---- lock body scroll when any overlay open ---- */
-  const anyOverlay = !!selected || showCompare || showReview
+  const anyOverlay = !!selected || showCompare || showReview || showPresentation
   useEffect(() => {
     document.body.classList.toggle('no-scroll', anyOverlay)
     return () => document.body.classList.remove('no-scroll')
@@ -404,6 +399,7 @@ export default function App() {
       setSelected(null)
       setShowCompare(false)
       setShowReview(false)
+      setShowPresentation(false)
       setMenuOpen(false)
     }
     window.addEventListener('keydown', onKey)
@@ -425,6 +421,8 @@ export default function App() {
   /* ---- open pages ---- */
   const openProblems = useCallback(() => { setMenuOpen(false); setPage('problems') }, [])
   const openSpoc = useCallback(() => { setMenuOpen(false); setPage('spoc') }, [])
+  const openImplementation = useCallback(() => { setMenuOpen(false); setPage('implementation') }, [])
+  const openFAQ = useCallback(() => { setMenuOpen(false); setPage('faq') }, [])
 
   /* ---- filtering + sorting ---- */
   const filtered = useMemo(() => {
@@ -474,7 +472,7 @@ export default function App() {
     [compare],
   )
 
-  /* ---- FAQ ---- */
+  /* ---- FAQ (short list shown on home) ---- */
   const FAQS = [
     {
       q: 'Who can participate in Smart India Hackathon?',
@@ -492,22 +490,6 @@ export default function App() {
       q: 'What is the prize for the winning team?',
       a: 'Each winning team receives ₹1,00,000 in prize money along with incubation and mentorship support from partner organisations.',
     },
-    {
-      q: 'How many SPOCs can an institute appoint?',
-      a: 'A minimum of 1 and a maximum of 2 SPOCs per institute are allowed. The SPOC must be a HOD, Principal, Dean, or an authorised faculty member.',
-    },
-    {
-      q: 'Can team members be from different colleges?',
-      a: 'No. All team members must be from the same college. However, students from different branches of the same college are encouraged to form a team.',
-    },
-    {
-      q: 'What should teams carry to the grand finale?',
-      a: 'Teams must carry their working prototype, any special sensors or components, laptops, chargers, extension boards, and their college ID cards. A detailed checklist is provided to shortlisted teams.',
-    },
-    {
-      q: 'How are winners evaluated?',
-      a: 'Judges score prototypes on innovation, feasibility, impact, scalability, and execution quality. The final decision rests with the national jury appointed by the Ministry of Education.',
-    },
   ]
 
   /* =========================================================
@@ -515,6 +497,20 @@ export default function App() {
      ========================================================= */
   if (page === 'spoc') {
     return <KnowYourSpocPage onBack={() => setPage('home')} />
+  }
+
+  /* =========================================================
+     RENDER: PROJECT IMPLEMENTATION PAGE
+     ========================================================= */
+  if (page === 'implementation') {
+    return <ProjectImplementationPage onBack={() => setPage('home')} />
+  }
+
+  /* =========================================================
+     RENDER: FAQ PAGE
+     ========================================================= */
+  if (page === 'faq') {
+    return <FAQPage onBack={() => setPage('home')} />
   }
 
   /* =========================================================
@@ -545,6 +541,7 @@ export default function App() {
 
           <nav className={`nav ${menuOpen ? 'show' : ''}`}>
             <button className="nav-link" onClick={openProblems}>Problems</button>
+
             {[
               ['Journey', 'journey'],
               ['Timeline', 'timeline'],
@@ -556,11 +553,22 @@ export default function App() {
                 {label}
               </button>
             ))}
+
             <button className="nav-link nav-link-spoc" onClick={openSpoc}>
-              <UserCheck size={15} /> Know Your SPOC
+              <UserCheck size={15} /> SPOC
             </button>
-            <button className="nav-cta" onClick={() => scrollTo('reviews')}>
-              Write a review <ArrowRight size={15} />
+
+            <button className="nav-link" onClick={openFAQ}>FAQ</button>
+
+            <button
+              className="nav-link"
+              onClick={() => { setMenuOpen(false); setShowPresentation(true) }}
+            >
+              <Presentation size={15} /> Deck
+            </button>
+
+            <button className="nav-cta" onClick={() => scrollTo('contact')}>
+              Contact <ArrowRight size={15} />
             </button>
           </nav>
 
@@ -639,10 +647,10 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ HERO VIDEO (NEW) ============ */}
+      {/* ============ HERO VIDEO ============ */}
       <HeroVideo />
 
-      {/* ============ ABOUT (EXPANDED) ============ */}
+      {/* ============ ABOUT ============ */}
       <section className="section about-section" id="about">
         <div className="container">
           <Reveal>
@@ -768,7 +776,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ MILESTONES CAROUSEL (NEW) ============ */}
+      {/* ============ MILESTONES CAROUSEL ============ */}
       <MilestonesCarousel />
 
       {/* ============ EXPLORER ============ */}
@@ -1004,34 +1012,26 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ THEMES ============ */}
+      {/* ============ THEMES CAROUSEL ============ */}
       <section className="section section-alt" id="themes">
         <div className="container">
           <Reveal>
-            <div className="section-head">
+            <div className="section-head themes-head">
               <span className="kicker mono">// Themes</span>
-              <h2>Twelve tracks. Infinite problems.</h2>
-              <p>Every problem statement maps to one of these thematic areas.</p>
+              <h2>Eighteen tracks. Infinite problems.</h2>
+              <p>Swipe through the thematic areas and pick the one that fits you best.</p>
             </div>
           </Reveal>
-          <div className="themes-grid">
-            {THEMES.map((t, i) => (
-              <Reveal key={t} delay={i * 35}>
-                <button
-                  className={`theme-card ${theme === t ? 'on' : ''}`}
-                  onClick={() => {
-                    setTheme(theme === t ? 'All' : t)
-                    setTimeout(() => scrollTo('explorer'), 80)
-                  }}
-                >
-                  <span className="theme-glow" />
-                  <Layers size={16} className="theme-icon" />
-                  <span className="theme-label">{t}</span>
-                  <ArrowRight size={14} className="theme-arrow" />
-                </button>
-              </Reveal>
-            ))}
-          </div>
+
+          <Reveal delay={80}>
+            <ThemesCarousel
+              activeTheme={theme}
+              onPick={(t) => {
+                setTheme(t)
+                setTimeout(() => scrollTo('explorer'), 80)
+              }}
+            />
+          </Reveal>
         </div>
       </section>
 
@@ -1188,7 +1188,12 @@ export default function App() {
 
             <Reveal delay={120}>
               <div className="faq">
-                <h3 className="faq-head">Frequently asked</h3>
+                <div className="faq-mini-head">
+                  <h3 className="faq-head">Frequently asked</h3>
+                  <button className="link-inline" onClick={openFAQ}>
+                    View all FAQs →
+                  </button>
+                </div>
                 {FAQS.map((f, i) => (
                   <div key={f.q} className={`faq-item ${faqOpen === i ? 'open' : ''}`}>
                     <button
@@ -1210,11 +1215,14 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ ORGANIZING COMMITTEE (NEW) ============ */}
+      {/* ============ ORGANIZING COMMITTEE ============ */}
       <OrganizingCommittee />
 
-      {/* ============ WHY SIH MATTERS (NEW) ============ */}
+      {/* ============ WHY SIH MATTERS ============ */}
       <WhySIHMatters />
+
+      {/* ============ CONTACT ============ */}
+      <ContactSection />
 
       {/* ============ FOOTER ============ */}
       <footer className="footer">
@@ -1240,17 +1248,19 @@ export default function App() {
               <button onClick={openSpoc}>Know Your SPOC</button>
             </div>
             <div>
+              <h5>Resources</h5>
+              <button onClick={openImplementation}>Project Implementation</button>
+              <button onClick={openFAQ}>FAQ</button>
+              <button onClick={() => setShowPresentation(true)}>Presentation deck</button>
+              <button onClick={() => scrollTo('resources')}>Downloads</button>
+              <button onClick={() => scrollTo('contact')}>Contact Us</button>
+            </div>
+            <div>
               <h5>Engage</h5>
               <button onClick={() => setShowReview(true)}>Write a review</button>
               <button onClick={() => scrollTo('reviews')}>Read reviews</button>
-              <button onClick={() => scrollTo('resources')}>Resources</button>
               <button onClick={() => scrollTo('participate')}>Participate</button>
-            </div>
-            <div>
-              <h5>Contact</h5>
-              <a href="mailto:hello@sih.example"><Mail size={14} /> hello@sih.example</a>
-              <a href="mailto:press@sih.example"><Send size={14} /> press@sih.example</a>
-              <span className="mono footer-loc"><MapPin size={14} /> New Delhi, India</span>
+              <button onClick={() => scrollTo('committee')}>Organising team</button>
             </div>
           </div>
         </div>
@@ -1384,6 +1394,15 @@ export default function App() {
           }}
         />
       )}
+
+      {/* ============ PRESENTATION MODAL ============ */}
+      <PresentationModal
+        open={showPresentation}
+        onClose={() => setShowPresentation(false)}
+        title="Smart India Hackathon — Official Deck"
+        embedUrl="https://docs.google.com/presentation/d/REPLACE_WITH_YOUR_ID/embed?start=false&loop=false"
+        downloadUrl="/sih-2026-deck.pdf"
+      />
 
       <Toast toast={toast} onClose={() => setToast(null)} />
     </div>

@@ -1,0 +1,166 @@
+export const FAQ_CATEGORIES = [
+  { id: 'general',   label: 'General' },
+  { id: 'eligibility', label: 'Eligibility' },
+  { id: 'team',      label: 'Team & Registration' },
+  { id: 'finale',    label: 'Grand Finale' },
+  { id: 'post-sih',  label: 'Post SIH & Deployment' },
+  { id: 'ip',        label: 'Intellectual Property' },
+]
+
+export const FAQ_ITEMS = [
+  /* ---- General ---- */
+  {
+    id: 'g1',
+    category: 'general',
+    q: 'What is Smart India Hackathon?',
+    a: 'Smart India Hackathon (SIH) is a nationwide initiative by the Ministry of Education\u2019s Innovation Cell (MIC) and AICTE to provide students with a platform to solve real-world problems faced by ministries, state governments, industries and NGOs. It is the world\u2019s largest open innovation model.',
+  },
+  {
+    id: 'g2',
+    category: 'general',
+    q: 'When was SIH launched and how many editions have there been?',
+    a: 'SIH was launched in 2017. The 2026 edition marks the 10th edition of the competition, having grown from a single-track hackathon into a multi-track national movement with 60+ nodal centres.',
+  },
+  {
+    id: 'g3',
+    category: 'general',
+    q: 'Is there a registration fee to participate?',
+    a: 'No. Participation in SIH is completely free for students. Travel and stay for the grand finale are supported by the organising ministry, and there are no hidden charges at any stage.',
+  },
+  {
+    id: 'g4',
+    category: 'general',
+    q: 'Where can I find the official problem statements?',
+    a: 'Problem statements are published on sih.gov.in during the registration window. You can browse and filter them on the Explorer page of this site, and click any card to see full details including the sponsoring ministry and eligibility criteria.',
+  },
+
+  /* ---- Eligibility ---- */
+  {
+    id: 'e1',
+    category: 'eligibility',
+    q: 'Who can participate in Smart India Hackathon?',
+    a: 'Any full-time student enrolled in a recognised Indian institution (UG, PG, or PhD) can participate. Students from any recognised college \u2014 engineering, science, arts, management \u2014 are eligible as long as the institution is registered with SIH.',
+  },
+  {
+    id: 'e2',
+    category: 'eligibility',
+    q: 'Can students from different colleges form a team?',
+    a: 'No. All six members of a team must be from the same college. However, students from different branches, years, or departments within the same college are encouraged to form multidisciplinary teams.',
+  },
+  {
+    id: 'e3',
+    category: 'eligibility',
+    q: 'Can first-year or second-year students participate?',
+    a: 'Yes. There is no minimum year of study requirement. First-year students are fully eligible, and many successful teams in past editions have included junior members alongside seniors.',
+  },
+  {
+    id: 'e4',
+    category: 'eligibility',
+    q: 'Is there an age limit for participation?',
+    a: 'There is no upper age limit. What matters is that you are a currently enrolled full-time student at a recognised Indian institution at the time of registration.',
+  },
+
+  /* ---- Team & Registration ---- */
+  {
+    id: 't1',
+    category: 'team',
+    q: 'How many members must a team have?',
+    a: 'A team must have exactly 6 members with at least one female member. Each team can also nominate one additional member as a reserve, bringing the effective strength to 7.',
+  },
+  {
+    id: 't2',
+    category: 'team',
+    q: 'Is a faculty mentor mandatory?',
+    a: 'Yes. Every team must nominate a faculty mentor from the same institution. The mentor guides the team through the registration, idea submission, and grand finale.',
+  },
+  {
+    id: 't3',
+    category: 'team',
+    q: 'How many SPOCs can an institute appoint?',
+    a: 'An institute may appoint a minimum of 1 and a maximum of 2 SPOCs (Single Point of Contact). The SPOC must be a HOD, Principal, Dean, or an authorised senior faculty member.',
+  },
+  {
+    id: 't4',
+    category: 'team',
+    q: 'Can a team submit ideas for more than one problem statement?',
+    a: 'Yes \u2014 a team may submit ideas for multiple problem statements during the idea phase, but can only compete with one problem statement at the grand finale.',
+  },
+
+  /* ---- Grand Finale ---- */
+  {
+    id: 'f1',
+    category: 'finale',
+    q: 'What is the duration of the grand finale?',
+    a: 'The grand finale is a continuous 36-hour hackathon. Teams arrive on Day 0, prototype non-stop across two days, and present to the national jury on the final day.',
+  },
+  {
+    id: 'f2',
+    category: 'finale',
+    q: 'What should teams carry to the grand finale?',
+    a: 'Teams must carry their working prototype, any special sensors or components, laptops, chargers, extension boards, and their college ID cards. A detailed checklist is provided to shortlisted teams by the nodal centre.',
+  },
+  {
+    id: 'f3',
+    category: 'finale',
+    q: 'How are winners evaluated at the finale?',
+    a: 'Judges score prototypes on innovation, feasibility, impact, scalability and execution quality. The evaluation rubric is published before the finale and the final decision rests with the national jury appointed by the Ministry of Education.',
+  },
+  {
+    id: 'f4',
+    category: 'finale',
+    q: 'What is the prize for the winning team?',
+    a: 'Each winning team receives \u20B91,00,000 in prize money along with incubation support, dedicated mentorship from the sponsoring ministry and fast-tracked pilot opportunities.',
+  },
+
+  /* ---- Post SIH & Deployment ---- */
+  {
+    id: 'p1',
+    category: 'post-sih',
+    q: 'What happens after a team wins SIH?',
+    a: 'The Ministry of Education shares winning team contact details with the sponsoring ministry. The ministry directly engages with the team to develop a project plan, provide expert mentors, procure required resources, and deploy the solution.',
+  },
+  {
+    id: 'p2',
+    category: 'post-sih',
+    q: 'How long does the post-SIH development phase take?',
+    a: 'Ideally between 6 months and 1 year from the end of the grand finale. The exact duration is decided by mutual consent between the winning team, the faculty mentor, and the sponsoring ministry.',
+  },
+  {
+    id: 'p3',
+    category: 'post-sih',
+    q: 'Do team members get a stipend during development?',
+    a: 'Yes, it is highly recommended. Each team member can receive a consolidated stipend of \u20B910,000 to \u20B915,000 per month for a minimum of 6 months. A maximum of 6 students receive this stipend.',
+  },
+  {
+    id: 'p4',
+    category: 'post-sih',
+    q: 'Are travel and stay expenses covered?',
+    a: 'Yes. For long-distance travel, each student is entitled to AC-III tier train fare. For short-distance travel (within 100 km of the college), \u20B91,000 per day is reimbursed on producing valid bills. Stay during long-distance travel is reimbursed at \u20B91,500 per day.',
+  },
+
+  /* ---- Intellectual Property ---- */
+  {
+    id: 'i1',
+    category: 'ip',
+    q: 'Who owns the intellectual property of a winning solution?',
+    a: 'The IP of the solution resides with the students who developed and deployed it post-hackathon. The sponsoring ministry has lifetime access to the solution for free, encouraging startups to be built around the developed solution.',
+  },
+  {
+    id: 'i2',
+    category: 'ip',
+    q: 'What if a ministry expert contributes significantly to the project?',
+    a: 'If an IT or domain expert from the ministry becomes a major contributor \u2014 as determined through consultation between the team, the ministry, and MIC/AICTE \u2014 then he or she may be considered a co-contributor in the IP.',
+  },
+  {
+    id: 'i3',
+    category: 'ip',
+    q: 'What about plagiarism and third-party components?',
+    a: 'Teams must use only verified open-source components and acknowledge them appropriately. Any conflict arising from plagiarism, IP, or copyright violations is solely the responsibility of the concerned team members. Ministries may obtain a signed declaration to indemnify themselves.',
+  },
+  {
+    id: 'i4',
+    category: 'ip',
+    q: 'Can team members be replaced after SIH?',
+    a: 'Yes. If a team member graduates, moves to higher studies or a job, or leaves for personal reasons, the team has the flexibility to include new members as replacements to continue development and deployment.',
+  },
+]
