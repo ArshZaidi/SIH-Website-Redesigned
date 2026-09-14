@@ -3,10 +3,15 @@ import {
   Menu, X, Search, ArrowRight, ArrowUpRight, Check, Star, ChevronDown,
   Users, Cpu, Lightbulb, Trophy, Calendar, Mail, Send, Sparkles,
   BookOpen, Building2, Target, Rocket, GraduationCap, Gavel, Plus,
-  MessageSquare, Zap, Filter, Award, Layers, MapPin, ExternalLink,
+  MessageSquare, Zap, Filter, Award, Layers, MapPin, ExternalLink, UserCheck,
 } from 'lucide-react'
 import './App.css'
 import ProblemsPage from './pages/ProblemsPage'
+import KnowYourSpocPage from './pages/KnowYourSpocPage'
+import HeroVideo from './components/HeroVideo'
+import MilestonesCarousel from './components/MilestonesCarousel'
+import OrganizingCommittee from './components/OrganizingCommittee'
+import WhySIHMatters from './components/WhySIHMatters'
 
 /* =========================================================
    DATA
@@ -119,10 +124,66 @@ const TIMELINE = [
 ]
 
 const JOURNEY = [
-  { step: '01', title: 'Register', desc: 'Create your team and pick a problem statement.', icon: Users },
-  { step: '02', title: 'Build', desc: 'Prototype with mentor support and open datasets.', icon: Cpu },
-  { step: '03', title: 'Submit', desc: 'Upload your repo, demo video and pitch deck.', icon: BookOpen },
-  { step: '04', title: 'Pitch', desc: 'Present live to the national jury at the finale.', icon: Trophy },
+  {
+    step: '01',
+    phase: 'Registration',
+    date: 'Aug 01 — Aug 20',
+    title: 'Register your team',
+    desc: 'Form a team of six with at least one female member, nominate a faculty mentor, and lock your preferred problem statements on the portal.',
+    icon: Users,
+    tags: ['Team of 6', 'Faculty mentor', 'Free entry'],
+    status: 'open',
+  },
+  {
+    step: '02',
+    phase: 'Ideation',
+    date: 'Aug 20 — Sep 05',
+    title: 'Submit your idea',
+    desc: 'Pitch a five-slide deck covering problem understanding, proposed solution, tech stack, feasibility and expected impact. Institute-level judges shortlist.',
+    icon: Lightbulb,
+    tags: ['5-slide deck', 'Institute round', 'Mentor review'],
+    status: 'open',
+  },
+  {
+    step: '03',
+    phase: 'Shortlist',
+    date: 'Sep 05 — Sep 20',
+    title: 'Campus evaluation',
+    desc: 'The institutional SPOC and evaluation panel score every submission on innovation, feasibility and clarity. Top teams per college advance to the finale.',
+    icon: Target,
+    tags: ['Scoring rubric', 'SPOC review', 'Shortlist'],
+    status: 'upcoming',
+  },
+  {
+    step: '04',
+    phase: 'Build',
+    date: 'Sep 25 — Sep 27',
+    title: '36-hour grand finale',
+    desc: 'Two rounds of non-stop prototyping with domain mentors on the floor. Ship a working demo — repository, walkthrough video and live demo.',
+    icon: Cpu,
+    tags: ['36 hours', 'Working demo', 'Live mentors'],
+    status: 'upcoming',
+  },
+  {
+    step: '05',
+    phase: 'Pitch',
+    date: 'Sep 27',
+    title: 'National jury pitch',
+    desc: 'Finalists present live to the national jury — eight minutes to demo, four minutes of Q&A. Judged on impact, scalability and execution quality.',
+    icon: Trophy,
+    tags: ['Live pitch', 'Q&A', 'National jury'],
+    status: 'upcoming',
+  },
+  {
+    step: '06',
+    phase: 'Rewards',
+    date: 'Oct 10',
+    title: 'Winners announced',
+    desc: 'Each winning team receives ₹1,00,000 along with incubation support, dedicated mentorship and fast-tracked ministry pilot opportunities.',
+    icon: Award,
+    tags: ['₹1,00,000', 'Incubation', 'Pilot support'],
+    status: 'upcoming',
+  },
 ]
 
 const SEED_REVIEWS = [
@@ -273,7 +334,7 @@ function Toast({ toast, onClose }) {
    ========================================================= */
 export default function App() {
   /* ---- page routing ---- */
-  const [page, setPage] = useState('home') // 'home' | 'problems'
+  const [page, setPage] = useState('home') // 'home' | 'problems' | 'spoc'
 
   /* ---- nav ---- */
   const [menuOpen, setMenuOpen] = useState(false)
@@ -286,8 +347,8 @@ export default function App() {
   const [sort, setSort] = useState('popular')
 
   /* ---- modals / overlays ---- */
-  const [selected, setSelected] = useState(null)       // problem detail
-  const [compare, setCompare] = useState([])           // ids
+  const [selected, setSelected] = useState(null)
+  const [compare, setCompare] = useState([])
   const [showCompare, setShowCompare] = useState(false)
   const [showReview, setShowReview] = useState(false)
   const [faqOpen, setFaqOpen] = useState(null)
@@ -310,6 +371,31 @@ export default function App() {
     document.body.classList.toggle('no-scroll', anyOverlay)
     return () => document.body.classList.remove('no-scroll')
   }, [anyOverlay])
+
+  /* ---- journey timeline progress ---- */
+  const journeyRef = useRef(null)
+  const [journeyProgress, setJourneyProgress] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = journeyRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const vh = window.innerHeight
+      const anchor = vh * 0.75
+      const total = rect.height + (anchor - vh)
+      const scrolled = anchor - rect.top
+      const p = Math.max(0, Math.min(1, scrolled / Math.max(total, 1)))
+      setJourneyProgress(p * 100)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
 
   /* ---- esc closes overlays ---- */
   useEffect(() => {
@@ -336,13 +422,11 @@ export default function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
 
-  /* ---- open the full problems page ---- */
-  const openProblems = useCallback(() => {
-    setMenuOpen(false)
-    setPage('problems')
-  }, [])
+  /* ---- open pages ---- */
+  const openProblems = useCallback(() => { setMenuOpen(false); setPage('problems') }, [])
+  const openSpoc = useCallback(() => { setMenuOpen(false); setPage('spoc') }, [])
 
-  /* ---- filtering + sorting (all combinable) ---- */
+  /* ---- filtering + sorting ---- */
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     let list = PROBLEMS.filter((p) => {
@@ -362,7 +446,7 @@ export default function App() {
       if (sort === 'title') return a.title.localeCompare(b.title)
       if (sort === 'difficulty') return DIFF_ORDER[a.difficulty] - DIFF_ORDER[b.difficulty]
       if (sort === 'ideas') return b.ideas - a.ideas
-      return b.ideas - a.ideas // popular
+      return b.ideas - a.ideas
     })
     return list
   }, [query, type, theme, difficulty, sort])
@@ -371,11 +455,7 @@ export default function App() {
     (type !== 'All') + (theme !== 'All') + (difficulty !== 'All') + (query.trim() ? 1 : 0)
 
   const resetFilters = () => {
-    setQuery('')
-    setType('All')
-    setTheme('All')
-    setDifficulty('All')
-    setSort('popular')
+    setQuery(''); setType('All'); setTheme('All'); setDifficulty('All'); setSort('popular')
   }
 
   /* ---- compare helpers ---- */
@@ -412,10 +492,33 @@ export default function App() {
       q: 'What is the prize for the winning team?',
       a: 'Each winning team receives ₹1,00,000 in prize money along with incubation and mentorship support from partner organisations.',
     },
+    {
+      q: 'How many SPOCs can an institute appoint?',
+      a: 'A minimum of 1 and a maximum of 2 SPOCs per institute are allowed. The SPOC must be a HOD, Principal, Dean, or an authorised faculty member.',
+    },
+    {
+      q: 'Can team members be from different colleges?',
+      a: 'No. All team members must be from the same college. However, students from different branches of the same college are encouraged to form a team.',
+    },
+    {
+      q: 'What should teams carry to the grand finale?',
+      a: 'Teams must carry their working prototype, any special sensors or components, laptops, chargers, extension boards, and their college ID cards. A detailed checklist is provided to shortlisted teams.',
+    },
+    {
+      q: 'How are winners evaluated?',
+      a: 'Judges score prototypes on innovation, feasibility, impact, scalability, and execution quality. The final decision rests with the national jury appointed by the Ministry of Education.',
+    },
   ]
 
   /* =========================================================
-     RENDER: PROBLEMS PAGE (full-page route)
+     RENDER: SPOC PAGE
+     ========================================================= */
+  if (page === 'spoc') {
+    return <KnowYourSpocPage onBack={() => setPage('home')} />
+  }
+
+  /* =========================================================
+     RENDER: PROBLEMS PAGE
      ========================================================= */
   if (page === 'problems') {
     return <ProblemsPage onBack={() => setPage('home')} />
@@ -441,22 +544,21 @@ export default function App() {
           </button>
 
           <nav className={`nav ${menuOpen ? 'show' : ''}`}>
-            {/* Nav item: Problems → opens full page */}
-            <button className="nav-link" onClick={openProblems}>
-              Problems
-            </button>
-
+            <button className="nav-link" onClick={openProblems}>Problems</button>
             {[
               ['Journey', 'journey'],
               ['Timeline', 'timeline'],
               ['Themes', 'themes'],
+              ['Milestones', 'milestones'],
               ['Reviews', 'reviews'],
-              ['Resources', 'resources'],
             ].map(([label, id]) => (
               <button key={id} onClick={() => scrollTo(id)} className="nav-link">
                 {label}
               </button>
             ))}
+            <button className="nav-link nav-link-spoc" onClick={openSpoc}>
+              <UserCheck size={15} /> Know Your SPOC
+            </button>
             <button className="nav-cta" onClick={() => scrollTo('reviews')}>
               Write a review <ArrowRight size={15} />
             </button>
@@ -510,7 +612,6 @@ export default function App() {
           </Reveal>
           <Reveal delay={240}>
             <div className="hero-actions">
-              {/* Hero CTA: Explore problem statements → opens full page */}
               <button className="btn btn-primary" onClick={openProblems}>
                 Explore problem statements <ArrowRight size={17} />
               </button>
@@ -538,8 +639,102 @@ export default function App() {
         </div>
       </section>
 
+      {/* ============ HERO VIDEO (NEW) ============ */}
+      <HeroVideo />
+
+      {/* ============ ABOUT (EXPANDED) ============ */}
+      <section className="section about-section" id="about">
+        <div className="container">
+          <Reveal>
+            <div className="section-head about-head">
+              <span className="kicker mono">// About</span>
+              <h2>What is Smart India Hackathon?</h2>
+            </div>
+          </Reveal>
+
+          <div className="about-layout">
+            <Reveal delay={60}>
+              <div className="about-main">
+                <p className="about-lead">
+                  Smart India Hackathon (SIH) is a premier nationwide initiative
+                  designed to engage students in solving some of the most
+                  pressing challenges faced in everyday life. Launched in 2017
+                  by the Ministry of Education&rsquo;s Innovation Cell (MIC) and
+                  the All India Council for Technical Education (AICTE), SIH has
+                  grown into the <strong>world&rsquo;s largest open innovation
+                  platform</strong>.
+                </p>
+                <p>
+                  SIH provides a dynamic platform for students to develop and
+                  showcase creative solutions to real-world problems sourced
+                  from ministries, state departments, PSUs, industries and
+                  NGOs. By encouraging participants to think critically and
+                  innovatively, the hackathon bridges the gap between academic
+                  knowledge and practical application — shifting students from
+                  marks-and-exams to problems-and-solutions.
+                </p>
+                <p>
+                  Each edition builds on the previous one, refining its approach
+                  and expanding its impact. The 2025 edition alone engaged over
+                  8.26 lakh students across 2,587 institutes, with 72,165 idea
+                  submissions competing for 271 problem statements. Winning
+                  solutions do not stay on paper — several have gone on to
+                  become deployable tools, products and startups, feeding
+                  directly into incubators and government programmes.
+                </p>
+
+                <div className="about-facts">
+                  <div className="af-item">
+                    <strong className="mono">2017</strong>
+                    <span>Founded by MIC &amp; AICTE</span>
+                  </div>
+                  <div className="af-item">
+                    <strong className="mono">60+</strong>
+                    <span>Nodal centres nationwide</span>
+                  </div>
+                  <div className="af-item">
+                    <strong className="mono">36h</strong>
+                    <span>Non-stop grand finale</span>
+                  </div>
+                  <div className="af-item">
+                    <strong className="mono">₹1L</strong>
+                    <span>Per winning team</span>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+
+            <Reveal delay={120}>
+              <div className="about-aside">
+                <div className="aa-card aa-quote">
+                  <span className="aa-mark">&ldquo;</span>
+                  <p>
+                    Through Smart India Hackathon, the youth power of the
+                    country is extracting the Amrit of solutions for developed
+                    India.
+                  </p>
+                  <span className="aa-author">
+                    — Shri Narendra Modi<br />
+                    <em>Hon&rsquo;ble Prime Minister of India</em>
+                  </span>
+                </div>
+                <div className="aa-card aa-mission">
+                  <h4>Our Mission</h4>
+                  <ul>
+                    <li>Foster a culture of innovation and practical problem-solving</li>
+                    <li>Connect student talent with real national challenges</li>
+                    <li>Build a pipeline from classroom ideas to deployable solutions</li>
+                    <li>Support the Viksit Bharat @2047 vision through technology</li>
+                  </ul>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* ============ FEATURED ============ */}
-      <section className="section">
+      <section className="section section-alt">
         <div className="container">
           <Reveal>
             <div className="section-head">
@@ -573,8 +768,11 @@ export default function App() {
         </div>
       </section>
 
-      {/* ============ EXPLORER (preview on home) ============ */}
-      <section className="section section-alt" id="explorer">
+      {/* ============ MILESTONES CAROUSEL (NEW) ============ */}
+      <MilestonesCarousel />
+
+      {/* ============ EXPLORER ============ */}
+      <section className="section" id="explorer">
         <div className="container">
           <Reveal>
             <div className="section-head">
@@ -584,7 +782,6 @@ export default function App() {
             </div>
           </Reveal>
 
-          {/* filter bar */}
           <Reveal delay={80}>
             <div className="filter-bar">
               <div className="search-wrap">
@@ -670,7 +867,6 @@ export default function App() {
             </div>
           </Reveal>
 
-          {/* results */}
           {filtered.length === 0 ? (
             <Reveal>
               <div className="empty">
@@ -723,7 +919,6 @@ export default function App() {
             </div>
           )}
 
-          {/* CTA below preview grid */}
           {filtered.length > 6 && (
             <Reveal>
               <div className="preview-cta">
@@ -737,26 +932,46 @@ export default function App() {
       </section>
 
       {/* ============ JOURNEY ============ */}
-      <section className="section" id="journey">
+      <section className="section section-alt journey-section" id="journey">
         <div className="container">
           <Reveal>
-            <div className="section-head">
+            <div className="section-head journey-head">
               <span className="kicker mono">// Journey</span>
               <h2>From idea to national finale</h2>
-              <p>Four steps. Thirty-six hours. One prototype that could change a ministry.</p>
+              <p>Six milestones between registration and the winner&rsquo;s podium.</p>
             </div>
           </Reveal>
-          <div className="journey-grid">
+
+          <div className="journey-timeline" ref={journeyRef}>
+            <div className="jt-rail" aria-hidden="true">
+              <div className="jt-rail-fill" style={{ height: `${journeyProgress}%` }} />
+            </div>
+
             {JOURNEY.map((j, i) => {
               const Icon = j.icon
               return (
-                <Reveal key={j.step} delay={i * 90}>
-                  <div className="journey-card">
-                    <div className="jc-icon"><Icon size={22} /></div>
-                    <span className="mono jc-step">{j.step}</span>
+                <Reveal
+                  key={j.step}
+                  delay={i * 60}
+                  className={`jt-item ${i % 2 === 0 ? 'left' : 'right'}`}
+                >
+                  <div className="jt-node">
+                    <Icon size={20} strokeWidth={1.8} />
+                  </div>
+                  <div className="jt-card">
+                    <div className="jt-card-top">
+                      <span className="mono jt-step">STEP {j.step}</span>
+                      <span className={`jt-status jt-status-${j.status}`}>
+                        {j.status === 'open' ? 'Open now' : 'Upcoming'}
+                      </span>
+                    </div>
+                    <span className="mono jt-date">{j.date}</span>
+                    <span className="jt-phase">{j.phase}</span>
                     <h3>{j.title}</h3>
                     <p>{j.desc}</p>
-                    <div className="jc-line" />
+                    <div className="jt-tags">
+                      {j.tags.map((t) => <span key={t} className="jt-tag">{t}</span>)}
+                    </div>
                   </div>
                 </Reveal>
               )
@@ -766,7 +981,7 @@ export default function App() {
       </section>
 
       {/* ============ TIMELINE ============ */}
-      <section className="section section-alt" id="timeline">
+      <section className="section" id="timeline">
         <div className="container">
           <Reveal>
             <div className="section-head">
@@ -790,7 +1005,7 @@ export default function App() {
       </section>
 
       {/* ============ THEMES ============ */}
-      <section className="section" id="themes">
+      <section className="section section-alt" id="themes">
         <div className="container">
           <Reveal>
             <div className="section-head">
@@ -806,11 +1021,13 @@ export default function App() {
                   className={`theme-card ${theme === t ? 'on' : ''}`}
                   onClick={() => {
                     setTheme(theme === t ? 'All' : t)
-                    scrollTo('explorer')
+                    setTimeout(() => scrollTo('explorer'), 80)
                   }}
                 >
-                  <Layers size={16} />
-                  <span>{t}</span>
+                  <span className="theme-glow" />
+                  <Layers size={16} className="theme-icon" />
+                  <span className="theme-label">{t}</span>
+                  <ArrowRight size={14} className="theme-arrow" />
                 </button>
               </Reveal>
             ))}
@@ -819,7 +1036,7 @@ export default function App() {
       </section>
 
       {/* ============ PARTICIPATE ============ */}
-      <section className="section section-alt" id="participate">
+      <section className="section" id="participate">
         <div className="container">
           <Reveal>
             <div className="section-head">
@@ -859,7 +1076,7 @@ export default function App() {
                   <ul className="role-list">
                     <li><Check size={15} /> Open to all UG, PG and PhD students</li>
                     <li><Check size={15} /> No registration fee</li>
-                    <li><Check size={15} /> Travel & stay covered for the finale</li>
+                    <li><Check size={15} /> Travel &amp; stay covered for the finale</li>
                   </ul>
                 </>
               )}
@@ -900,7 +1117,7 @@ export default function App() {
       </section>
 
       {/* ============ REVIEWS ============ */}
-      <section className="section" id="reviews">
+      <section className="section section-alt" id="reviews">
         <div className="container">
           <Reveal>
             <div className="section-head reviews-head">
@@ -939,7 +1156,7 @@ export default function App() {
       </section>
 
       {/* ============ RESOURCES / FAQ ============ */}
-      <section className="section section-alt" id="resources">
+      <section className="section" id="resources">
         <div className="container">
           <Reveal>
             <div className="section-head">
@@ -993,6 +1210,12 @@ export default function App() {
         </div>
       </section>
 
+      {/* ============ ORGANIZING COMMITTEE (NEW) ============ */}
+      <OrganizingCommittee />
+
+      {/* ============ WHY SIH MATTERS (NEW) ============ */}
+      <WhySIHMatters />
+
       {/* ============ FOOTER ============ */}
       <footer className="footer">
         <div className="container footer-inner">
@@ -1014,6 +1237,7 @@ export default function App() {
               <button onClick={() => scrollTo('journey')}>How it works</button>
               <button onClick={() => scrollTo('timeline')}>Timeline</button>
               <button onClick={() => scrollTo('themes')}>Themes</button>
+              <button onClick={openSpoc}>Know Your SPOC</button>
             </div>
             <div>
               <h5>Engage</h5>
@@ -1198,7 +1422,6 @@ function ReviewFormModal({ onClose, onSubmit }) {
     setErrors(e)
     if (Object.keys(e).length) return
     setSubmitting(true)
-    // simulate a frontend submit
     setTimeout(() => {
       onSubmit({
         name: form.name.trim(),
