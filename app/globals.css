@@ -5589,173 +5589,31 @@ textarea {
   }
 }
 
-/* =========================================================
-   SIH HEADER LOGO
-========================================================= */
-
 .brand-logo-wrap {
-  position: relative;
-
   display: flex;
-
   align-items: center;
-
-  justify-content: flex-start;
-
-  /*
-   * Do NOT force a square.
-   * The actual SIH logo is wider than it is tall.
-   */
-  width: auto !important;
-  height: 54px !important;
-
   flex-shrink: 0;
-
   overflow: visible;
 }
 
-
-/* Actual SIH logo */
-
 .brand-logo {
   display: block;
-
   width: auto;
-
-  /*
-   * Keep the original SVG aspect ratio.
-   */
   height: 48px;
-
   max-width: 180px;
-
   object-fit: contain;
-
-  object-position: left center;
-
-  flex-shrink: 0;
 }
-
-
-/* =========================================================
-   FALLBACK MARK
-========================================================= */
-
-.brand-mark {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  width: 42px;
-  height: 42px;
-
-  position: relative;
-
-  flex-shrink: 0;
-}
-
-.bm-saffron,
-.bm-green {
-  position: absolute;
-
-  width: 19px;
-  height: 31px;
-
-  border-radius: 50% 50% 45% 45%;
-
-  transform: rotate(30deg);
-}
-
-.bm-saffron {
-  background: var(--saffron);
-
-  left: 5px;
-}
-
-.bm-green {
-  background: var(--green);
-
-  right: 5px;
-
-  transform: rotate(-30deg);
-}
-
-
-/* =========================================================
-   HEADER ALIGNMENT
-========================================================= */
-
-.header .brand {
-  display: flex;
-
-  align-items: center;
-
-  flex-shrink: 0;
-
-  min-width: 180px;
-}
-
-.header .brand-logo-wrap {
-  margin: 0;
-}
-
-
-/* =========================================================
-   DESKTOP
-========================================================= */
-
-@media (min-width: 901px) {
-  .brand-logo {
-    height: 50px;
-
-    max-width: 185px;
-  }
-
-  .brand-logo-wrap {
-    height: 54px !important;
-  }
-}
-
-
-/* =========================================================
-   TABLET
-========================================================= */
 
 @media (max-width: 900px) {
-  .header .brand {
-    min-width: 150px;
-  }
-
   .brand-logo {
     height: 44px;
-
     max-width: 160px;
-  }
-
-  .brand-logo-wrap {
-    height: 48px !important;
   }
 }
 
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
 @media (max-width: 600px) {
-  .header .brand {
-    min-width: auto;
-  }
-
   .brand-logo {
     height: 40px;
-
     max-width: 145px;
-  }
-
-  .brand-logo-wrap {
-    height: 44px !important;
   }
 }

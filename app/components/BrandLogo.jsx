@@ -1,39 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 
 export default function BrandLogo({
   size = 44,
   alt = "Smart India Hackathon",
 }) {
-  const [failed, setFailed] = useState(false);
-
   return (
-    <span
+    <div
       className="brand-logo-wrap"
-      aria-label={alt}
+      style={{
+        height: size,
+        width: "auto",
+      }}
     >
-      {!failed ? (
-        <img
-          src="/logos/sih-logo.svg"
-          alt={alt}
-          className="brand-logo"
-          onError={() => {
-            console.warn(
-              "[BrandLogo] Failed to load /logos/sih-logo.svg"
-            );
-            setFailed(true);
-          }}
-        />
-      ) : (
-        <span
-          className="brand-mark"
-          aria-hidden="true"
-        >
-          <span className="bm-saffron" />
-          <span className="bm-green" />
-        </span>
-      )}
-    </span>
+      <Image
+        src="/logos/sih-logo.png"
+        alt={alt}
+        width={180}
+        height={size}
+        className="brand-logo"
+        priority
+      />
+    </div>
   );
 }
