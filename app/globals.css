@@ -5617,3 +5617,17 @@ textarea {
     max-width: 145px;
   }
 }
+
+/* Prevent any component from creating page-level horizontal scroll */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

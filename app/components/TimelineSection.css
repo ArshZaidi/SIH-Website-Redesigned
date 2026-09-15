@@ -2561,11 +2561,6 @@
   border-radius: 50%;
 }
 
-
-/* =========================================================
-   HOVER
-========================================================= */
-
 .ct-member:hover .ct-avatar {
   transform: translateY(-2px);
 
@@ -2580,11 +2575,6 @@
   transform: scale(1.04);
 }
 
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
 @media (max-width: 600px) {
   .ct-avatar {
     width: 44px !important;
@@ -2596,21 +2586,12 @@
   }
 }
 
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
 @media (prefers-reduced-motion: reduce) {
   .ct-avatar,
   .ct-avatar-img {
     transition: none;
   }
 }
-
-/* =========================================================
-   VERY SMALL PHONES
-========================================================= */
 
 @media (max-width: 420px) {
   .timeline-heading-row h2 {
@@ -2622,11 +2603,6 @@
   }
 }
 
-
-/* =========================================================
-   REDUCED MOTION
-========================================================= */
-
 @media (prefers-reduced-motion: reduce) {
   .timeline-card,
   .timeline-icon,
@@ -2637,4 +2613,34 @@
   .status-live {
     animation: none;
   }
+}
+
+.timeline-section {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.timeline-sticky {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.timeline-container {
+  width: min(1180px, 100%);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.timeline-viewport {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.timeline-track {
+  max-width: none;
+  will-change: transform;
 }
