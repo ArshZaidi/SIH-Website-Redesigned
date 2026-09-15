@@ -2010,21 +2010,34 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(180deg, var(--bg), var(--bg-2));
+  padding: 72px 0;
 }
+
 .why-section::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 0% 50%, rgba(216, 141, 82, 0.05), transparent 50%),
-    radial-gradient(ellipse at 100% 50%, rgba(90, 128, 108, 0.05), transparent 50%);
+    radial-gradient(
+      ellipse at 0% 50%,
+      rgba(216, 141, 82, 0.05),
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 100% 50%,
+      rgba(90, 128, 108, 0.05),
+      transparent 50%
+    );
   pointer-events: none;
 }
 
 .why-grid {
+  position: relative;
+  z-index: 1;
+
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
-  gap: 48px;
+  gap: 40px;
   align-items: start;
 }
 
@@ -2033,37 +2046,46 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  margin: 12px 0 18px;
-}
-.why-left > p {
-  font-size: 0.96rem;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 28px;
+  margin: 8px 0 14px;
 }
 
-.why-right { display: flex; flex-direction: column; gap: 16px; }
+.why-left > p {
+  font-size: 0.94rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.why-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 .why-point {
   display: flex;
-  gap: 16px;
-  padding: 20px 22px;
+  gap: 14px;
+  padding: 17px 19px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--panel);
-  transition: transform 0.35s var(--ease), border-color 0.3s, box-shadow 0.35s;
+  transition:
+    transform 0.35s var(--ease),
+    border-color 0.3s,
+    box-shadow 0.35s;
   animation: fadeUp 0.6s var(--ease) both;
 }
+
 .why-point:hover {
-  transform: translateX(6px);
+  transform: translateX(5px);
   border-color: rgba(216, 141, 82, 0.4);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
 }
 
 .wp-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
   background: rgba(216, 141, 82, 0.12);
   color: var(--saffron-2);
   display: grid;
@@ -2071,10 +2093,67 @@
   flex-shrink: 0;
   transition: transform 0.35s var(--ease);
 }
-.why-point:hover .wp-icon { transform: rotate(-8deg) scale(1.1); }
 
-.wp-text h4 { font-size: 0.94rem; margin-bottom: 6px; }
-.wp-text p { font-size: 0.84rem; color: var(--muted); line-height: 1.55; }
+.why-point:hover .wp-icon {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.wp-text h4 {
+  font-size: 0.92rem;
+  margin-bottom: 4px;
+}
+
+.wp-text p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .why-section {
+    padding: 60px 0;
+  }
+
+  .why-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .why-section {
+    padding: 60px 0;
+  }
+
+  .why-grid {
+    gap: 24px;
+  }
+
+  .why-left h2 {
+    margin-top: 6px;
+    margin-bottom: 12px;
+  }
+
+  .why-left > p {
+    margin-bottom: 18px;
+  }
+
+  .why-right {
+    gap: 10px;
+  }
+
+  .why-point {
+    padding: 15px 16px;
+    gap: 12px;
+  }
+
+  .wp-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
 
 /* =========================================================
    19. FOOTER
