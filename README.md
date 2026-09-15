@@ -1,40 +1,63 @@
-# Smart India Hackathon — Build What Matters
+## ✨ Key Features
 
-A premium frontend-only student redesign concept for Smart India Hackathon. This is not an official SIH platform.
+### 🔥 Problem Explorer & Smart Discovery
 
-## Stack
-- Vite + React
-- JavaScript / JSX
-- CSS design tokens and responsive layout
-- Lucide React icons
+The heart of the redesign is an interactive **Problem Statement Explorer** built to make discovering SIH challenges faster, cleaner, and more engaging.
 
-## Features
-- Cinematic editorial homepage
-- Interactive problem statement explorer with search and Software/Hardware filters
-- Problem detail modal
-- Problem statement comparison dock (up to three)
-- Find Your Challenge interaction entry point
-- Team journey tracker
-- Horizontal milestone timeline
-- Themes, editions, role-based participation concept, resources, and footer attribution
-- Responsive mobile navigation and reduced-motion support
+Instead of forcing participants to scroll through hundreds of problem statements, the explorer provides a focused discovery experience.
 
-## Run locally
-```bash
-npm install
-npm run dev
-```
+**Features:**
 
-Build for production:
-```bash
-npm run build
-```
+- 🔎 **Instant Search** — Quickly search problem statements by title, ID, organisation, or keywords
+- 🧩 **Software / Hardware Filters** — Narrow challenges by problem category
+- 🏷️ **Problem Categories** — Understand the type and domain of each challenge
+- 📄 **Detailed Problem View** — Open a dedicated interactive view with complete problem information
+- ⚡ **Real-time Filtering** — Results update instantly as users search and filter
+- 🎯 **Find Your Challenge** — A dedicated interaction designed to help participants discover suitable problems
+- 📱 **Responsive Explorer** — Works across desktop, tablet, and mobile
 
-## Structure
-- `src/App.jsx` — application composition and local interactions
-- `src/App.css` — visual system and responsive layouts
-- `src/index.css` — global tokens, font imports, and resets
-- `src/data/` — reserved for expanding local datasets
+The objective is to turn:
 
-## Disclaimer
-Smart India Hackathon is an initiative of the Ministry of Education's Innovation Cell (MIC) & AICTE. This website is a student redesign concept created for educational/hackathon purposes. It is not an official Smart India Hackathon platform.
+> **"Find a problem statement"**
+
+into:
+
+> **"Discover the problem you want to solve."**
+
+---
+
+### ⚖️ Problem Statement Comparer
+
+One of the core features of the redesign is the **Problem Statement Comparison System**.
+
+Participants can select multiple problem statements and compare them side-by-side before deciding which challenge to pursue.
+
+**Features:**
+
+- ➕ Add problem statements to comparison
+- ⚖️ Compare up to **3 problems simultaneously**
+- 📊 Side-by-side comparison interface
+- 🔍 Compare important problem information at a glance
+- 🗑️ Remove individual problems from the comparison
+- 📌 Persistent comparison dock while exploring
+- 🚀 Quickly jump from comparison to the selected problem
+- 📱 Responsive comparison experience
+
+This helps participants make a more informed decision instead of opening and closing multiple problem statements repeatedly.
+
+### The flow
+
+```text
+Explore
+   ↓
+Search / Filter
+   ↓
+Open Problem
+   ↓
+Add to Compare
+   ↓
+Select up to 3
+   ↓
+Compare
+   ↓
+Choose Your Challenge
